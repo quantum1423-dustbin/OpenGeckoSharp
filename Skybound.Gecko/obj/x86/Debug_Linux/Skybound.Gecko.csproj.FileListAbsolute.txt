@@ -1,0 +1,10 @@
+E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\x86\Debug_Linux\ResolveAssemblyReference.cache
+E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\x86\Debug_Linux\Skybound.Gecko.ChromeDialog.resources
+E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\x86\Debug_Linux\Skybound.Gecko.ConfirmDialog.resources
+E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\x86\Debug_Linux\Skybound.Gecko.PasswordDialog.resources
+E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\x86\Debug_Linux\Skybound.Gecko.PromptDialog.resources
+E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\x86\Debug_Linux\Skybound.Gecko.PropertiesDialog.resources
+E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\x86\Debug_Linux\GenerateResource-ResGen.read.1.tlog
+E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\x86\Debug_Linux\GenerateResource-ResGen.write.1.tlog
+E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\bin\x86\Debug_Linux\OpenGeckoSharp.dll
+E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\x86\Debug_Linux\OpenGeckoSharp.dll
