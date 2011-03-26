@@ -64,8 +64,11 @@ namespace Skybound.Gecko
 		}
 	}
 	
-
+	#if GECKO_1_8
+	class PromptService : nsIPromptService, nsINonBlockingAlertService
+	#elif GECKO_1_9
 	class PromptService : nsIPromptService2, nsINonBlockingAlertService
+	#endif
 	{
 		public void Alert(nsIDOMWindow aParent, string aDialogTitle, string aText)
 		{
@@ -205,33 +208,36 @@ namespace Skybound.Gecko
 		{
 		      ConfirmDialog dialog = new ConfirmDialog(aText, aDialogTitle, "OK", null, null, null);
 		      dialog.Show();
-        }
+		}
+		
+		#region nsIPromptService2 Members
+		#if GECKO_1_9
+		
+		public bool PromptAuth(nsIDOMWindow aParent, IntPtr aChannel, int level, nsIAuthInformation authInfo, string checkboxLabel, IntPtr aCheckValue)
+		{
+			string userName = nsString.Get(authInfo.GetUsername);
+			string password = nsString.Get(authInfo.GetPassword);
+			
+			string realm = nsString.Get(authInfo.GetRealm);
+			
+			if (PromptUsernameAndPassword(aParent, "Server Authentication", "The server '"  + realm + "' requires a user name and password.", ref userName, ref password, checkboxLabel, aCheckValue))
+			{
+				nsString.Set(authInfo.SetUsername, userName);
+				nsString.Set(authInfo.SetPassword, password);
+				return true;
+			}
+			
+ 			return false;
+		}
 
-        #region nsIPromptService2 Members
-        public bool PromptAuth(nsIDOMWindow aParent, IntPtr aChannel, int level, nsIAuthInformation authInfo, string checkboxLabel, IntPtr aCheckValue)
-        {
-            string userName = nsString.Get(authInfo.GetUsername);
-            string password = nsString.Get(authInfo.GetPassword);
-
-            string realm = nsString.Get(authInfo.GetRealm);
-
-            if (PromptUsernameAndPassword(aParent, "Server Authentication", "The server '" + realm + "' requires a user name and password.", ref userName, ref password, checkboxLabel, aCheckValue))
-            {
-                nsString.Set(authInfo.SetUsername, userName);
-                nsString.Set(authInfo.SetPassword, password);
-                return true;
-            }
-
-            return false;
-        }
-
-        public nsICancelable AsyncPromptAuth(nsIDOMWindow aParent, IntPtr aChannel, nsIAuthPromptCallback aCallback, nsISupports aContext, uint level, nsIAuthInformation authInfo, string checkboxLabel, IntPtr checkValue)
-        {
-            //throw new NotImplementedException();
-            return null;
-        }
-
-        #endregion
-    }
+		public nsICancelable AsyncPromptAuth(nsIDOMWindow aParent, IntPtr aChannel, nsIAuthPromptCallback aCallback, nsISupports aContext, uint level, nsIAuthInformation authInfo, string checkboxLabel, IntPtr checkValue)
+		{
+			//throw new NotImplementedException();
+ 			return null;
+		}
+		#endif
+		
+		#endregion
+	}
 	#endif
 }

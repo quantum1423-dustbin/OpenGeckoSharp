@@ -38,7 +38,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Windows.Forms;
-using System.Runtime.CompilerServices;
 
 namespace Skybound.Gecko
 {
@@ -49,16 +48,16 @@ namespace Skybound.Gecko
 	{
 		#region Native Methods
 		[DllImport("xpcom", CharSet = CharSet.Ansi)]
-		static extern int NS_InitXPCOM2([MarshalAs(UnmanagedType.Interface)] out nsIServiceManager serviceManager, [MarshalAs(UnmanagedType.IUnknown)] object binDirectory, nsIDirectoryServiceProvider appFileLocationProvider);
+		static extern int NS_InitXPCOM2(out IntPtr serviceManager, [MarshalAs(UnmanagedType.IUnknown)] object binDirectory, nsIDirectoryServiceProvider appFileLocationProvider);
 		
 		[DllImport("xpcom", CharSet = CharSet.Ansi)]
 		static extern int NS_NewNativeLocalFile(nsACString path, bool followLinks, [MarshalAs(UnmanagedType.IUnknown)] out object result);
 		
 		[DllImport("xpcom", CharSet = CharSet.Ansi)]
-		static extern int NS_GetComponentManager([MarshalAs(UnmanagedType.Interface)] out nsInterfaces componentManager);
+		static extern int NS_GetComponentManager(out nsInterfaces componentManager);
 		
 		[DllImport("xpcom", CharSet = CharSet.Ansi)]
-		static extern int NS_GetComponentRegistrar([MarshalAs(UnmanagedType.Interface)] out nsIComponentRegistrar componentRegistrar);
+		static extern int NS_GetComponentRegistrar(out nsIComponentRegistrar componentRegistrar);
 		
 		[DllImport("xpcom", EntryPoint="NS_Alloc")]
 		public static extern IntPtr Alloc(int size);
@@ -78,26 +77,6 @@ namespace Skybound.Gecko
 			Initialize(null);
 		}
 		
-		public static bool IsLinux
-		{
-			get { return Environment.OSVersion.Platform == PlatformID.Unix; }
-		}
-		
-		public static bool IsWindows
-		{
-			get { return !IsLinux; }
-		}
-		
-		public static bool IsMono
-		{
-			get { return Type.GetType ("Mono.Runtime") != null; }
-		}
-		
-		public static bool IsDotNet
-		{
-			get { return !IsMono; }	
-		}
-			
 		/// <summary>
 		/// Initializes XPCOM using the specified directory.
 		/// </summary>
@@ -108,7 +87,7 @@ namespace Skybound.Gecko
 				return;
 			
 			string folder = binDirectory ?? Environment.CurrentDirectory;
-			string xpcomPath = Path.Combine(folder, IsLinux ? "libxpcom.so" : "xpcom.dll");
+			string xpcomPath = Path.Combine(folder, "xpcom.dll");
 			
 			if (Debugger.IsAttached)
 			{
@@ -119,7 +98,13 @@ namespace Skybound.Gecko
 						"If you do not have XULRunner installed, click Yes to open the download page.  Otherwise, click No, and update your application startup code.",
 							"XULRunner Not Found", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
 					{
+						#if GECKO_1_9_1
 						Process.Start("http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.2/runtimes/xulrunner-1.9.1.2.en-US.win32.zip");
+						#elif GECKO_1_9
+						Process.Start("http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.0.13/runtimes/xulrunner-1.9.0.13.en-US.win32.zip");
+						#elif GECKO_1_8
+						Process.Start("http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/1.8.1.3/contrib/win32");
+						#endif
 					}
 					
 					Environment.Exit(0);
@@ -147,7 +132,7 @@ namespace Skybound.Gecko
 			String oldCurrent = Environment.CurrentDirectory;
 			Environment.CurrentDirectory = folder;
 			
-			nsIServiceManager serviceManagerPtr;
+			IntPtr serviceManagerPtr;
 			//int res = NS_InitXPCOM2(out serviceManagerPtr, mreAppDir, new DirectoryServiceProvider());
 			int res = NS_InitXPCOM2(out serviceManagerPtr, mreAppDir, null);
 			
@@ -159,7 +144,7 @@ namespace Skybound.Gecko
 				throw new Exception("Failed on NS_InitXPCOM2");
 			}
 			
-			ServiceManager = (nsIServiceManager)serviceManagerPtr;
+			ServiceManager = (nsIServiceManager)Marshal.GetObjectForIUnknown(serviceManagerPtr);
 			
 			// get some global objects we will need later
 			NS_GetComponentManager(out ComponentManager);
@@ -169,8 +154,7 @@ namespace Skybound.Gecko
 			// crash when loading a site over HTTPS.  in order to work around this bug, we must register an nsIDirectoryServiceProvider
 			// which will provide the location of a profile
 			nsIDirectoryService directoryService = GetService<nsIDirectoryService>("@mozilla.org/file/directory_service;1");
-			if (directoryService != null)
-				directoryService.RegisterProvider(new ProfileProvider());
+			directoryService.RegisterProvider(new ProfileProvider());
 			
 			_IsInitialized = true;
 		}
@@ -191,9 +175,11 @@ namespace Skybound.Gecko
 			{
 				if (_ProfileDirectory == null)
 				{
-
+					#if GECKO_1_9
 					string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Geckofx\1.9\DefaultProfile");
-
+					#elif GECKO_1_8
+					string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Geckofx\1.8\DefaultProfile");
+					#endif
 					if (!Directory.Exists(directory))
 					{
 						Directory.CreateDirectory(directory);
@@ -294,20 +280,11 @@ namespace Skybound.Gecko
 					// convert it to a managed interface
 					QI_nsIInterfaceRequestor req = (QI_nsIInterfaceRequestor)Marshal.GetObjectForIUnknown(pInterfaceRequestor);
 					
-					if (req != null)
-					{
+					// try to get the requested interface
+					req.GetInterface(ref iid, out ppv);
 					
-						try
-						{
-							req.GetInterface(ref iid, out ppv);
-							// clean up
-							Marshal.ReleaseComObject(req);
-						}
-						catch(NullReferenceException e)
-						{
-							Debug.WriteLine("NullRefException from native code.");
-						}
-					}
+					// clean up
+					Marshal.ReleaseComObject(req);
 					Marshal.Release(pInterfaceRequestor);
 				}
 			}
@@ -328,8 +305,6 @@ namespace Skybound.Gecko
 		[Guid("033a1470-8b2a-11d3-af88-00a024ffc08c"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 		interface QI_nsIInterfaceRequestor
 		{
-
-			[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
 			[PreserveSig] int GetInterface(ref Guid uuid, out IntPtr pUnk);
 		}
 		

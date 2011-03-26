@@ -36,26 +36,11 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
 
 namespace Skybound.Gecko
 {
 	partial class PasswordDialog : Form
 	{
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MARGINS
-        {
-            public int cxLeftWidth;
-            public int cxRightWidth;
-            public int cyTopHeight;
-            public int cyButtomheight;
-        }
-
-        [DllImport("dwmapi.dll")]
-
-        public static extern int DwmExtendFrameIntoClientArea(IntPtr hWnd, ref MARGINS pMarinset);
-        
 		public PasswordDialog()
 		{
 			InitializeComponent();
@@ -103,26 +88,5 @@ namespace Skybound.Gecko
 		{
 			get { return checkBox.Checked; }
 		}
-
-        private void PasswordDialog_Load(object sender, EventArgs e)
-        {
-            foreach (Process clsProcess in Process.GetProcesses())
-            {
-                if (clsProcess.ProcessName.Contains("dwm"))
-                {
-                    MARGINS margins = new MARGINS();
-                    margins.cxLeftWidth = -1;
-                    margins.cxRightWidth = -1;
-                    margins.cyTopHeight = -1;
-                    margins.cyButtomheight = -1;
-                    //set all the four value -1 to apply glass effect to the whole window
-                    //set your own value to make specific part of the window glassy.
-                    IntPtr hwnd = this.Handle;
-                    int result = DwmExtendFrameIntoClientArea(hwnd, ref margins);
-                    this.BackColor = System.Drawing.Color.BlanchedAlmond;
-                    this.BackgroundImage = null;
-                }
-            }
-        }
 	}
 }

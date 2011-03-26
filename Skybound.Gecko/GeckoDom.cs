@@ -37,7 +37,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Drawing;
-using System.Diagnostics;
 
 namespace Skybound.Gecko
 {
@@ -243,16 +242,13 @@ namespace Skybound.Gecko
 	{
 		internal GeckoElement(nsIDOMHTMLElement element) : base(element)
 		{
-			this.DomElement = element;			
-			this.DomNSElement = (nsIDOMNSElement)element;
+			this.DomElement = element;
+            //this.DomNSElement = (nsIDOMNSElement)element;
 			this.DomNSHTMLElement = (nsIDOMNSHTMLElement)element;
 			
-			if (Xpcom.IsDotNet) // TODO FIXME: ChangeWrapperHandleStrength not implemented in mono
-			{
-				// since a reference is stored in the base class, we only need weak references here
-				Marshal.ChangeWrapperHandleStrength(DomNSElement, true);
-				Marshal.ChangeWrapperHandleStrength(DomNSHTMLElement, true);
-			}
+			// since a reference is stored in the base class, we only need weak references here
+            //Marshal.ChangeWrapperHandleStrength(DomNSElement, true);
+			Marshal.ChangeWrapperHandleStrength(DomNSHTMLElement, true);
 		}
 		
 		internal static GeckoElement Create(nsIDOMHTMLElement element)
@@ -261,19 +257,8 @@ namespace Skybound.Gecko
 		}
 		
 		nsIDOMHTMLElement DomElement;
-		nsIDOMNSElement DomNSElement;
+		//nsIDOMNSElement DomNSElement;
 		nsIDOMNSHTMLElement DomNSHTMLElement;
-		
-		/// <summary>
-		/// Gets the inline style of the GeckoElement. 
-		/// </summary>
-		public GeckoStyle Style
-		{
-			get
-			{
-				return GeckoStyle.Create(Xpcom.QueryInterface<nsIDOMElementCSSInlineStyle>(DomObject).GetStyle());
-			}
-		}
 		
 		/// <summary>
 		/// Gets the parent element of this one.
@@ -408,14 +393,21 @@ namespace Skybound.Gecko
 			DomElement.RemoveAttribute(new nsAString(attributeName));
 		}
 		
-
+		#if GECKO_1_9_1
 		public int ScrollLeft { get { return DomNSElement.GetScrollLeft(); } set { DomNSElement.SetScrollLeft(value); } }
 		public int ScrollTop { get { return DomNSElement.GetScrollTop(); } set { DomNSElement.SetScrollTop(value); } }
 		public int ScrollWidth { get { return DomNSElement.GetScrollWidth(); } }
 		public int ScrollHeight { get { return DomNSElement.GetScrollHeight(); } }
 		public int ClientWidth { get { return DomNSElement.GetClientWidth(); } }
 		public int ClientHeight { get { return DomNSElement.GetClientHeight(); } }
-
+		#else
+		public int ScrollLeft { get { return DomNSHTMLElement.GetScrollLeft(); } set { DomNSHTMLElement.SetScrollLeft(value); } }
+		public int ScrollTop { get { return DomNSHTMLElement.GetScrollTop(); } set { DomNSHTMLElement.SetScrollTop(value); } }
+		public int ScrollWidth { get { return DomNSHTMLElement.GetScrollWidth(); } }
+		public int ScrollHeight { get { return DomNSHTMLElement.GetScrollHeight(); } }
+		public int ClientWidth { get { return DomNSHTMLElement.GetClientWidth(); } }
+		public int ClientHeight { get { return DomNSHTMLElement.GetClientHeight(); } }
+		#endif
 		public int OffsetLeft { get { return DomNSHTMLElement.GetOffsetLeft(); } }
 		public int OffsetTop { get { return DomNSHTMLElement.GetOffsetTop(); } }
 		public int OffsetWidth { get { return DomNSHTMLElement.GetOffsetWidth(); } }
@@ -452,7 +444,49 @@ namespace Skybound.Gecko
 			get { return DomNSHTMLElement.GetTabIndex(); }
 			set { DomNSHTMLElement.SetTabIndex(value); }
 		}
-
+		
+		#if GECKO_1_9
+		/// <summary>
+		/// Returns a set of elements with the given class name.  This element and all child elements are searched.
+		/// </summary>
+		/// <param name="classes"></param>
+		/// <returns></returns>
+		public GeckoNodeCollection GetElementsByClassName(string classes)
+		{
+			using (nsAString str = new nsAString(classes))
+				return new GeckoNodeCollection(((nsIDOMNSElement)DomElement).GetElementsByClassName(str));
+		}
+		
+		/// <summary>
+		/// Gets a rectangle which represents the union of all bounding rectangles within the element.
+		/// </summary>
+		public RectangleF BoundingClientRect
+		{
+			get
+			{
+				nsIDOMNSElement ns = (nsIDOMNSElement)DomElement;
+				nsIDOMClientRect rect = ns.GetBoundingClientRect();
+				return RectangleF.FromLTRB(rect.GetLeft(), rect.GetTop(), rect.GetRight(), rect.GetBottom());
+			}
+		}
+		
+		/// <summary>
+		/// Returns an array containing all bounding rectangles within the element.
+		/// </summary>
+		/// <returns></returns>
+		public RectangleF [] GetClientRects()
+		{
+			nsIDOMNSElement ns = (nsIDOMNSElement)DomElement;
+			nsIDOMClientRectList rects = ns.GetClientRects();
+			RectangleF [] result = new RectangleF[rects.GetLength()];
+			for (int i = 0; i < result.Length; i++)
+			{
+				nsIDOMClientRect rect = rects.Item(i);
+				result[i] = RectangleF.FromLTRB(rect.GetLeft(), rect.GetTop(), rect.GetRight(), rect.GetBottom());
+			}
+			return result;
+		}
+		#endif
 	}
 	
 	/// <summary>
@@ -701,7 +735,8 @@ namespace Skybound.Gecko
 			
 			return DomDocument.IsSupported(new nsAString(feature), new nsAString(version));
 		}
-				
+		
+		#if GECKO_1_9
 		/// <summary>
 		/// Gets the currently focused element.
 		/// </summary>
@@ -731,11 +766,7 @@ namespace Skybound.Gecko
 		{
 			return GeckoElement.Create((nsIDOMHTMLElement)((nsIDOMNSDocument)DomDocument).ElementFromPoint(x, y));
 		}
-		
-		public GeckoRange CreateRange()
-		{
-			return new GeckoRange(((nsIDOMDocumentRange)DomDocument).CreateRange());
-		}
+		#endif
 	}
 	
 	public class GeckoNamedNodeMap : IEnumerable<GeckoNode>

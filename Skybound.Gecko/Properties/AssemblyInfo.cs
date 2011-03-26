@@ -38,16 +38,24 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("OpenGeckoSharp")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("An effort to keep GeckoFX open-source")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Copyright © 2011 Authors of OpenGeckoSharp. Some Rights Reserved. GNU GPL v3.")]
+[assembly: AssemblyCompany("All About Stuff (http://sb.allaboutstuff.net/english)")]
+[assembly: AssemblyProduct("OpenGeckoSharp")]
+[assembly: AssemblyCopyright("Copyright © 2011 All About Stuff. Some Rights Reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
 [assembly: Guid("2d144611-62c5-4eb8-a0ae-8a1617949dcc")]
 
-[assembly: AssemblyVersion("0.0.1.0")]
-[assembly: AssemblyFileVersion("0.0.1.0")]
+#if GECKO_1_9_1
+[assembly: AssemblyVersion("1.9.1.0")]
+[assembly: AssemblyFileVersion("1.9.1.0")]
+#elif GECKO_1_9
+[assembly: AssemblyVersion("1.9.0.1")]
+[assembly: AssemblyFileVersion("1.9.0.1")]
+#elif GECKO_1_8
+[assembly: AssemblyVersion("0.1.9.2")]
+[assembly: AssemblyFileVersion("0.0.0.0")]
+#endif

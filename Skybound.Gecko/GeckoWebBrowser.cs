@@ -1,5 +1,5 @@
 ﻿#region ***** BEGIN LICENSE BLOCK *****
-/* Version: MPL 1.1/GPL 2.0/LGPL 2.1
+/* Version: GPL 3.0/MPL1.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
  * 1.1 (the "License"); you may not use this file except in compliance with
@@ -11,7 +11,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Skybound Software code.
+ * The Code is based on Work from Skybound Software. The Current Developer is Eric Dong.
  *
  * The Initial Developer of the Original Code is Skybound Software.
  * Portions created by the Initial Developer are Copyright (C) 2008-2009
@@ -20,16 +20,15 @@
  * Contributor(s):
  *
  * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or
- * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
- * in which case the provisions of the GPL or the LGPL are applicable instead
+ * either the GNU General Public License Version 3 or later (the "GPL"),
+ * in which case the provisions of the GPL are applicable instead
  * of those above. If you wish to allow use of your version of this file only
- * under the terms of either the GPL or the LGPL, and not to allow others to
+ * under the terms of either the GPL, and not to allow others to
  * use your version of this file under the terms of the MPL, indicate your
  * decision by deleting the provisions above and replace them with the notice
- * and other provisions required by the GPL or the LGPL. If you do not delete
+ * and other provisions required by the GPL. If you do not delete
  * the provisions above, a recipient may use your version of this file under
- * the terms of any one of the MPL, the GPL or the LGPL.
+ * the terms of any one of the MPL or the GPL.
  */
 #endregion END LICENSE BLOCK
  
@@ -67,10 +66,6 @@ namespace Skybound.Gecko
 		/// </summary>
 		public GeckoWebBrowser()
 		{
-#if GTK
-			if (Xpcom.IsMono)
-				m_wrapper = new GtkDotNet.GtkReparentingWrapperNoThread(new Gtk.Window(Gtk.WindowType.Popup), this);
-#endif
 		}
 		
 		//static Dictionary<nsIDOMDocument, GeckoWebBrowser> FromDOMDocumentTable = new Dictionary<nsIDOMDocument,GeckoWebBrowser>();
@@ -100,40 +95,18 @@ namespace Skybound.Gecko
 				BaseWindow = null;
 			}
 			
-#if GTK			
-			if (m_wrapper != null)
-				m_wrapper.Dispose();
-#endif
-			
 			base.Dispose(disposing);
 		}
 		#endregion
 		
 		nsIWebBrowser WebBrowser;
+		nsIWebBrowserFocus WebBrowserFocus;
 		nsIBaseWindow BaseWindow;
 		nsIWebNavigation WebNav;
 		int ChromeFlags;
-
-		public nsIWebBrowserFocus WebBrowserFocus
-		{
-			get; protected set;
-		}
-
-#if GTK
-		// Only used on Linux.
-		protected GtkDotNet.GtkWrapperNoThread m_wrapper;
-#endif
 		
 		protected override void OnHandleCreated(EventArgs e)
-		{		
-#if GTK	
-			if (Xpcom.IsMono)
-			{
-				base.OnHandleCreated(e);
-				m_wrapper.Init();
-			}
-#endif
-			
+		{
 			if (!this.DesignMode)
 			{
 				Xpcom.Initialize();
@@ -162,14 +135,7 @@ namespace Skybound.Gecko
 				//      if (treeItem19 != null)
 				//            treeItem19.SetItemType(type);
 				//}
-
-#if GTK
-				if (Xpcom.IsMono)
-					BaseWindow.InitWindow(m_wrapper.BrowserWindow.Handle, IntPtr.Zero, 0, 0, this.Width, this.Height);
-				else
-#endif
-					BaseWindow.InitWindow(this.Handle, IntPtr.Zero, 0, 0, this.Width, this.Height);
-
+				BaseWindow.InitWindow(this.Handle, IntPtr.Zero, 0, 0, this.Width, this.Height);
 				BaseWindow.Create();
 				
 				Guid nsIWebProgressListenerGUID = typeof(nsIWebProgressListener).GUID;
@@ -180,29 +146,22 @@ namespace Skybound.Gecko
 				target.AddEventListener(new nsAString("submit"), this, true);
 				target.AddEventListener(new nsAString("keydown"), this, true);
 				target.AddEventListener(new nsAString("keyup"), this, true);
-				target.AddEventListener(new nsAString("keypress"), this, true);
 				target.AddEventListener(new nsAString("mousemove"), this, true);
 				target.AddEventListener(new nsAString("mouseover"), this, true);
 				target.AddEventListener(new nsAString("mouseout"), this, true);
 				target.AddEventListener(new nsAString("mousedown"), this, true);
 				target.AddEventListener(new nsAString("mouseup"), this, true);
 				target.AddEventListener(new nsAString("click"), this, true);
-				target.AddEventListener(new nsAString("compositionstart"), this, true);
-				target.AddEventListener(new nsAString("compositionend"), this, true);
-				target.AddEventListener(new nsAString("contextmenu"), this, true);
-				target.AddEventListener(new nsAString("DOMMouseScroll"), this, true);
-				target.AddEventListener(new nsAString("focus"), this, true);
 				
 				// history
-				if (WebNav.GetSessionHistory() != null)
-					WebNav.GetSessionHistory().AddSHistoryListener(this);
+				WebNav.GetSessionHistory().AddSHistoryListener(this);
 				
 				BaseWindow.SetVisibility(true);
 				
 				if ((this.ChromeFlags & (int)GeckoWindowFlags.OpenAsChrome) == 0)
-				{							
+				{
 					// navigating to about:blank allows drag & drop to work properly before a page has been loaded into the browser
-					Navigate("about:blank");					
+					Navigate("about:blank");
 				}	
 				
 				// this fix prevents the browser from crashing if the first page loaded is invalid (missing file, invalid URL, etc)
@@ -291,7 +250,7 @@ namespace Skybound.Gecko
 				using (Brush brush = new System.Drawing.Drawing2D.HatchBrush(System.Drawing.Drawing2D.HatchStyle.SolidDiamond, Color.FromArgb(240, 240, 240), Color.White))
 					e.Graphics.FillRectangle(brush, this.ClientRectangle);
 				
-				e.Graphics.DrawString("Skybound GeckoFX v" + versionString + "\r\n" + copyright + "\r\n" + "http://www.geckofx.org", SystemFonts.MessageBoxFont, Brushes.Black,
+				e.Graphics.DrawString("All About Stuff OpenGFX v" + versionString + "\r\n" + copyright + "\r\n" + "http://www.geckofx.org", SystemFonts.MessageBoxFont, Brushes.Black,
 					new RectangleF(2, 2, this.Width-4, this.Height-4));
 				e.Graphics.DrawRectangle(SystemPens.ControlDark, 0, 0, Width-1, Height-1);
 			}
@@ -353,7 +312,7 @@ namespace Skybound.Gecko
 					m.Result = (IntPtr)DLGC_WANTALLKEYS;
 					return;
 				}
-				else if (m.Msg == WM_MOUSEACTIVATE && Xpcom.IsWindows) // TODO FIXME: port for Linux
+				else if (m.Msg == WM_MOUSEACTIVATE)
 				{
 					m.Result = (IntPtr)MA_ACTIVATE;
 					
@@ -578,7 +537,7 @@ namespace Skybound.Gecko
 				      
 				      fixed (byte * data = &Data[Position])
 				      {
-						fun(this, aClosure, (IntPtr)data, Position, length, out writeCount);
+						int result = fun(this, aClosure, (IntPtr)data, Position, length, out writeCount);
 				      }
 				      
 				      Position += writeCount;
@@ -1092,10 +1051,7 @@ namespace Skybound.Gecko
 				if (WebNav == null)
 					return null;
 				
-				IntPtr /*nsURI*/ IUnknownPtr =  WebNav.GetCurrentURI();
-				nsIURI locationComObject = (nsIURI)Marshal.GetObjectForIUnknown(IUnknownPtr); 
-				nsURI location = new nsURI(locationComObject);
-				
+				nsURI location = WebNav.GetCurrentURI();
 				if (!location.IsNull)
 				{
 					Uri result;
@@ -1116,10 +1072,8 @@ namespace Skybound.Gecko
 			{
 				if (WebNav == null)
 					return null;
-			
-				IntPtr /*nsIURI*/ IUnknownPtr =  WebNav.GetReferringURI();
-				nsIURI location = (nsIURI)Marshal.GetObjectForIUnknown(IUnknownPtr);
 				
+				nsIURI location = WebNav.GetReferringURI();
 				if (location != null)
 				{
 					return new Uri(nsString.Get(location.GetSpec));
@@ -1273,24 +1227,13 @@ namespace Skybound.Gecko
 				((GeckoProgressEventHandler)this.Events[ProgressChangedEvent])(this, e);
 		}
 		#endregion
-
+		
 		/// <summary>
 		/// Saves the current document to the specified file name.
 		/// </summary>
 		/// <param name="filename"></param>
 		/// <returns></returns>
 		public void SaveDocument(string filename)
-		{
-			SaveDocument(filename, null);
-		}
-
-
-		/// <summary>
-		/// Saves the current document to the specified file name.
-		/// </summary>
-		/// <param name="filename"></param>
-		/// <returns></returns>
-		public void SaveDocument(string filename, string outputMimeType)//hatton added mimeType param
 		{
 			if (!Directory.Exists(Path.GetDirectoryName(filename)))
 				throw new System.IO.DirectoryNotFoundException();
@@ -1301,7 +1244,7 @@ namespace Skybound.Gecko
 			if (persist != null)
 			{
 				persist.SaveDocument((nsIDOMDocument)Document.DomObject, Xpcom.NewNativeLocalFile(filename), null,
-					outputMimeType, 0, 0);
+					null, 0, 0);
 			}
 			else
 			{
@@ -1324,7 +1267,49 @@ namespace Skybound.Gecko
 			}
 		}
 		GeckoSessionHistory _History;
-		
+        /// <summary>
+        /// Gets the favicon of the current WebSite
+        /// </summary>
+        public Icon Favicon
+        {
+            get
+            {
+                if (Url.HostNameType == UriHostNameType.Dns)
+                {
+                    // Get the URL of the favicon
+                    // url.Host will return such string as www.google.com
+                    string iconURL = "http://" + Url.Host + "/favicon.ico";
+                    System.Net.WebRequest request = System.Net.HttpWebRequest.Create(iconURL);
+                    System.Net.WebResponse response = request.GetResponse();
+                    System.IO.Stream stream = response.GetResponseStream();
+                    Icon favicon = new Icon(stream);
+                    return favicon as Icon;
+                }
+                else return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the favicon of the current WebSite as an image
+        /// </summary>
+        public Image FaviconAsImage
+        {
+            get
+            {
+                if (Url.HostNameType == UriHostNameType.Dns)
+                {
+                    // Get the URL of the favicon
+                    // url.Host will return such string as www.google.com
+                    string iconURL = "http://" + Url.Host + "/favicon.ico";
+                    System.Net.WebRequest request = System.Net.HttpWebRequest.Create(iconURL);
+                    System.Net.WebResponse response = request.GetResponse();
+                    System.IO.Stream stream = response.GetResponseStream();
+                    Image favicon = Image.FromStream(stream);
+                    return favicon as Image;
+                }
+                else return null;
+            }
+        }
 		#region nsIWebBrowserChrome Members
 
 		void nsIWebBrowserChrome.SetStatus(int statusType, string status)
@@ -1546,6 +1531,9 @@ namespace Skybound.Gecko
 		/// <param name="url"></param>
 		public void ViewSource(string url)
 		{
+			//#if GECKO_1_9
+			//OpenDialog("chrome://global/content/viewSource.xul", "all,dialog=no", "a", "b", "c");
+			//#elif GECKO_1_8
 			Form form = new Form();
 			form.Text = "View Source";
 			GeckoWebBrowser browser = new GeckoWebBrowser();
@@ -1556,7 +1544,33 @@ namespace Skybound.Gecko
 			form.ClientSize = this.ClientSize;
 			form.StartPosition = FormStartPosition.CenterParent;
 			form.Show();			
+			//#endif
 		}
+		
+		// this is disabled for now because it stopped working
+		
+		//#if GECKO_1_9
+		///// <summary>
+		///// Opens a chrome dialog.  This method is private for now until we finalize how it's going to work.  And it doesn't work in 1.8 because
+		///// the method signature for OpenWindowJS is different (it takes a jsval* for the arguments).
+		///// </summary>
+		///// <param name="chromeUrl"></param>
+		///// <param name="features"></param>
+		///// <param name="args"></param>
+		//void OpenDialog(string chromeUrl, string features, params object [] args)
+		//{
+		//      nsPIWindowWatcher watcher = Xpcom.GetService<nsPIWindowWatcher>("@mozilla.org/embedcomp/window-watcher;1");
+		//      if (watcher == null)
+		//      {
+		//            throw new Exception("Couldn't obtain the window watcher service.");
+		//      }
+			
+		//      nsIArray argsArray = (args.Length > 0) ? nsArray.Create(args) : null;
+			
+		//      // open the window
+		//      nsIDOMWindow window = watcher.OpenWindowJS((nsIDOMWindow)this.Window.DomWindow, chromeUrl, "_blank", features, true, argsArray);
+		//}
+		//#endif
 		
 		/// <summary>
 		/// Displays a properties dialog for the current page.
@@ -1765,12 +1779,6 @@ namespace Skybound.Gecko
 			IntPtr ppv, pUnk = Marshal.GetIUnknownForObject(this);
 			
 			Marshal.QueryInterface(pUnk, ref uuid, out ppv);
-
-			if (Xpcom.IsMono)
-			{
-				// TODO FIXME - remove this hack.
-				Marshal.AddRef(ppv);
-			}
 			
 			Marshal.Release(pUnk);
 			
@@ -1937,7 +1945,6 @@ namespace Skybound.Gecko
 			{
 				case "keydown": OnDomKeyDown((GeckoDomKeyEventArgs)(ea = new GeckoDomKeyEventArgs((nsIDOMKeyEvent)e))); break;
 				case "keyup": OnDomKeyUp((GeckoDomKeyEventArgs)(ea = new GeckoDomKeyEventArgs((nsIDOMKeyEvent)e))); break;
-				case "keypress": OnDomKeyPress((GeckoDomKeyEventArgs)(ea = new GeckoDomKeyEventArgs((nsIDOMKeyEvent)e))); break;
 				
 				case "mousedown": OnDomMouseDown((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;
 				case "mouseup": OnDomMouseUp((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;
@@ -1946,11 +1953,6 @@ namespace Skybound.Gecko
 				case "mouseout": OnDomMouseOut((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;
 				case "click": OnDomClick(ea = new GeckoDomEventArgs(e)); break;
 				case "submit": OnDomSubmit(ea = new GeckoDomEventArgs(e)); break;
-				case "compositionstart": OnDomCompositionStart(ea = new GeckoDomEventArgs(e)); break;
-				case "compositionend": OnDomCompositionEnd(ea = new GeckoDomEventArgs(e)); break;
-				case "contextmenu": OnDomContextMenu((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;				
-				case "DOMMouseScroll": OnDomMouseScroll((GeckoDomMouseEventArgs)(ea = new GeckoDomMouseEventArgs((nsIDOMMouseEvent)e))); break;				
-				case "focus": OnDomFocus(ea = new GeckoDomEventArgs(e)); break;
 			}
 			
 			if (ea != null && ea.Cancelable && ea.Handled)
@@ -1990,22 +1992,6 @@ namespace Skybound.Gecko
 		{
 			if (((GeckoDomKeyEventHandler)this.Events[DomKeyUpEvent]) != null)
 				((GeckoDomKeyEventHandler)this.Events[DomKeyUpEvent])(this, e);
-		}
-		
-		[Category("DOM Events")]
-		public event GeckoDomKeyEventHandler DomKeyPress
-		{
-			add { this.Events.AddHandler(DomKeyPressEvent, value); }
-			remove { this.Events.RemoveHandler(DomKeyPressEvent, value); }
-		}
-		private static object DomKeyPressEvent = new object();
-		
-		/// <summary>Raises the <see cref="DomKeyPress"/> event.</summary>
-		/// <param name="e">The data for the event.</param>
-		protected virtual void OnDomKeyPress(GeckoDomKeyEventArgs e)
-		{
-			if (((GeckoDomKeyEventHandler)this.Events[DomKeyPressEvent]) != null)
-				((GeckoDomKeyEventHandler)this.Events[DomKeyPressEvent])(this, e);
 		}
 		#endregion
 		
@@ -2099,42 +2085,6 @@ namespace Skybound.Gecko
 		}
 		#endregion
 		
-		#region public event GeckoDomMouseEventHandler DomContextMenu
-		[Category("DOM Events")]
-		public event GeckoDomMouseEventHandler DomContextMenu
-		{
-			add { this.Events.AddHandler(DomContextMenuEvent, value); }
-			remove { this.Events.RemoveHandler(DomContextMenuEvent, value); }
-		}
-		private static object DomContextMenuEvent = new object();
-
-		/// <summary>Raises the <see cref="DomContextMenu"/> event.</summary>
-		/// <param name="e">The data for the event.</param>
-		protected virtual void OnDomContextMenu(GeckoDomMouseEventArgs e)
-		{
-			if (((GeckoDomMouseEventHandler)this.Events[DomContextMenuEvent]) != null)
-				((GeckoDomMouseEventHandler)this.Events[DomContextMenuEvent])(this, e);
-		}
-		#endregion
-		
-		#region public event GeckoDomMouseEventHandler DOMMouseScroll
-		[Category("DOM Events")]
-		public event GeckoDomMouseEventHandler DomMouseScroll
-		{
-			add { this.Events.AddHandler(DomMouseScrollEvent, value); }
-			remove { this.Events.RemoveHandler(DomMouseScrollEvent, value); }
-		}
-		private static object DomMouseScrollEvent = new object();
-
-		/// <summary>Raises the <see cref="DOMMouseScroll"/> event.</summary>
-		/// <param name="e">The data for the event.</param>
-		protected virtual void OnDomMouseScroll(GeckoDomMouseEventArgs e)
-		{
-			if (((GeckoDomMouseEventHandler)this.Events[DomMouseScrollEvent]) != null)
-				((GeckoDomMouseEventHandler)this.Events[DomMouseScrollEvent])(this, e);
-		}
-		#endregion	
-		
 		#region public event GeckoDomEventHandler DomSubmit
 		[Category("DOM Events")]
 		public event GeckoDomEventHandler DomSubmit
@@ -2150,60 +2100,6 @@ namespace Skybound.Gecko
 		{
 			if (((GeckoDomEventHandler)this.Events[DomSubmitEvent]) != null)
 				((GeckoDomEventHandler)this.Events[DomSubmitEvent])(this, e);
-		}
-		#endregion
-		
-		#region public event GeckoDomEventHandler DomCompositionStart
-		[Category("DOM Events")]
-		public event GeckoDomEventHandler DomCompositionStart
-		{
-			add { this.Events.AddHandler(DomCompositionStartEvent, value); }
-			remove { this.Events.RemoveHandler(DomCompositionStartEvent, value); }
-		}
-		private static object DomCompositionStartEvent = new object();
-
-		/// <summary>Raises the <see cref="DomCompositionStart"/> event.</summary>
-		/// <param name="e">The data for the event.</param>
-		protected virtual void OnDomCompositionStart(GeckoDomEventArgs e)
-		{
-			if (((GeckoDomEventHandler)this.Events[DomCompositionStartEvent]) != null)
-				((GeckoDomEventHandler)this.Events[DomCompositionStartEvent])(this, e);
-		}
-		#endregion
-		
-		#region public event GeckoDomEventHandler DomCompositionEnd
-		[Category("DOM Events")]
-		public event GeckoDomEventHandler DomCompositionEnd
-		{
-			add { this.Events.AddHandler(DomCompositionEndEvent, value); }
-			remove { this.Events.RemoveHandler(DomCompositionEndEvent, value); }
-		}
-		private static object DomCompositionEndEvent = new object();
-
-		/// <summary>Raises the <see cref="DomCompositionEnd"/> event.</summary>
-		/// <param name="e">The data for the event.</param>
-		protected virtual void OnDomCompositionEnd(GeckoDomEventArgs e)
-		{
-			if (((GeckoDomEventHandler)this.Events[DomCompositionEndEvent]) != null)
-				((GeckoDomEventHandler)this.Events[DomCompositionEndEvent])(this, e);
-		}
-		#endregion
-		
-		#region public event GeckoDomEventHandler DomFocus
-		[Category("DOM Events")]
-		public event GeckoDomEventHandler DomFocus
-		{
-			add { this.Events.AddHandler(DomFocusEvent, value); }
-			remove { this.Events.RemoveHandler(DomFocusEvent, value); }
-		}
-		private static object DomFocusEvent = new object();
-
-		/// <summary>Raises the <see cref="DomFocus"/> event.</summary>
-		/// <param name="e">The data for the event.</param>
-		protected virtual void OnDomFocus(GeckoDomEventArgs e)
-		{
-			if (((GeckoDomEventHandler)this.Events[DomFocusEvent]) != null)
-				((GeckoDomEventHandler)this.Events[DomFocusEvent])(this, e);
 		}
 		#endregion
 		
