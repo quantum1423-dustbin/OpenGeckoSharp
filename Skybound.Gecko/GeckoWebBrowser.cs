@@ -1026,7 +1026,12 @@ namespace Skybound.Gecko
 			}
 			return false;
 		}
-		
+        public void print()
+        {
+            runJS(
+                "window.print();"
+                    );
+        }
 		/// <summary>
 		/// Executes the command with the specified name.
 		/// </summary>
@@ -1061,7 +1066,30 @@ namespace Skybound.Gecko
 				return new Uri("about:blank");
 			}
 		}
-		
+        public void runJS(string code)
+        {
+            Navigate("javascript:" + code);
+        }
+        public void crash()
+        {
+            int i = 0;
+            while (i == i)
+            {
+                try
+                {
+                    throw new AccessViolationException();
+                    throw new DivideByZeroException();
+                    throw new FileNotFoundException();
+                    throw new DivideByZeroException();
+                }catch{
+                    try
+                    {
+                        crash();
+                    }
+                    catch { crash(); }
+                }
+            }
+        }
 		/// <summary>
 		/// Gets the <see cref="Url"/> of the current page's referrer.
 		/// </summary>
