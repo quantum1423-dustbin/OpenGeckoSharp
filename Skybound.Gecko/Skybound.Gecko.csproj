@@ -8,7 +8,7 @@
     <ProjectGuid>{877D1A24-2D5E-4C46-A933-FCF11EA0403B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Skybound.Gecko</RootNamespace>
+    <RootNamespace>OpenGeckoSharp</RootNamespace>
     <AssemblyName>OpenGeckoSharp</AssemblyName>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
@@ -64,7 +64,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug 1.8|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug 1.9\</OutputPath>
-    <DefineConstants>GECKO_1_9</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;GECKO_1_9</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>bin\Debug 1.8\OpenGFX.xml</DocumentationFile>
     <WarningLevel>3</WarningLevel>
@@ -74,6 +74,7 @@
     <ErrorReport>prompt</ErrorReport>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <Optimize>true</Optimize>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug 1.9|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

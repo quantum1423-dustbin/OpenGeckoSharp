@@ -166,8 +166,9 @@ namespace Skybound.Gecko
 		[PreserveSig]
 		int provideWindow(nsIDOMWindow aParent, uint aChromeFlags, bool aPositionSpecified, bool aSizeSpecified, nsIURI aURI, nsAString aName, nsAString aFeatures, out bool aWindowIsNew, out nsIDOMWindow ret);
 	}
-	
-	[Guid("b6c2f9e1-53a0-45f2-a2b8-fe37861fe8a8"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+
+    //used to be b6c2f9e1-53a0-45f2-a2b8-fe37861fe8a8
+	[Guid("c175a596-ee13-420a-aa74-13ad3a14deb1"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 	interface nsIXULWindow
 	{
 		IntPtr GetDocShell(); // nsIDocShell
@@ -190,8 +191,9 @@ namespace Skybound.Gecko
 		void SetXULBrowserWindow(IntPtr aXULBrowserWindow); // nsIXULBrowserWindow
 		void ApplyChromeFlags();
 	}
-	
-	[Guid("93a28ba2-7e22-11d9-9b6f-000a95d535fa"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+
+    //used to be 93a28ba2-7e22-11d9-9b6f-000a95d535fa
+    [Guid("361facd0-6e9a-4ff1-a0d4-450744cf0023"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 	interface nsIAppShellService
 	{
 		nsIXULWindow CreateTopLevelWindow(nsIXULWindow aParent, nsIURI aUrl, uint aChromeMask, int aInitialWidth, int aInitialHeight, [MarshalAs(UnmanagedType.IUnknown)] object aAppShell);
@@ -1232,8 +1234,8 @@ namespace Skybound.Gecko
 		nsIDOMNode Item(int index);
 		nsIDOMNode NamedItem(nsAString name);
 	}
-	
-	#if GECKO_1_9_1
+
+    //isolated this GUID as the culprit for the InnerHTML bug in alpha 0.8.1
 	[Guid("7F142F9A-FBA7-4949-93D6-CF08A974AC51"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 	interface nsIDOMNSHTMLElement
 	{
@@ -1254,52 +1256,6 @@ namespace Skybound.Gecko
 		bool GetSpellcheck();
 		void SetSpellcheck(bool aSpellcheck);
 	}
-	#else
-	#if GECKO_1_8
-	[Guid("da83b2ec-8264-4410-8496-ada3acd2ae42"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	#elif GECKO_1_9
-	[Guid("eac0a4ee-2e4f-403c-9b77-5cf32cfb42f7"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	#endif
-	interface nsIDOMNSHTMLElement
-	{
-		int GetOffsetTop();
-		int GetOffsetLeft();
-		int GetOffsetWidth();
-		int GetOffsetHeight();
-		nsIDOMElement GetOffsetParent();
-		void GetInnerHTML(nsAString aInnerHTML);
-		void SetInnerHTML(nsAString aInnerHTML);
-		int GetScrollTop();
-		void SetScrollTop(int aScrollTop);
-		int GetScrollLeft();
-		void SetScrollLeft(int aScrollLeft);
-		int GetScrollHeight();
-		int GetScrollWidth();
-		#if GECKO_1_8
-		int GetClientHeight();
-		int GetClientWidth();
-		int GetTabIndex();
-		void SetTabIndex(int aTabIndex);
-		void Blur();
-		void Focus();
-		void ScrollIntoView(bool top);
-		#elif GECKO_1_9
-		int GetClientTop();
-		int GetClientLeft();
-		int GetClientHeight();
-		int GetClientWidth();
-		int GetTabIndex();
-		void SetTabIndex(int aTabIndex);
-		void GetContentEditable(nsAString aContentEditable);
-		void SetContentEditable(nsAString aContentEditable);
-		void Blur();
-		void Focus();
-		void ScrollIntoView(bool top);
-		bool GetSpellcheck();
-		void SetSpellcheck(bool aSpellcheck);
-		#endif
-	}
-	#endif
 	
 	[Guid("3d9f4973-dd2e-48f5-b5f7-2634e09eadd9"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 	interface nsIDOMDocumentStyle
@@ -1869,17 +1825,12 @@ namespace Skybound.Gecko
 		nsIDOMElement ElementFromPoint(int x, int y);
 	}
 	
-	#if GECKO_1_9_1
 	[Guid("f0aef489-18c5-4de6-99d5-58b3758b098c"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	#else
-	[Guid("cea6f919-7fe6-4bdd-9db6-158d9283f8d3"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	#endif
 	interface nsIDOMNSElement
 	{
 		nsIDOMNodeList GetElementsByClassName(nsAString classes);
 		nsIDOMClientRectList GetClientRects();
 		nsIDOMClientRect GetBoundingClientRect();
-		#if GECKO_1_9_1
 		int GetScrollTop();
 		void SetScrollTop(int value);
 		int GetScrollLeft();
@@ -1896,7 +1847,6 @@ namespace Skybound.Gecko
 		nsIDOMElement GetNextElementSibling();
 		int GetChildElementCount();
 		nsIDOMNodeList GetChildren();
-		#endif
 	}
 	
 	#if GECKO_1_9_1

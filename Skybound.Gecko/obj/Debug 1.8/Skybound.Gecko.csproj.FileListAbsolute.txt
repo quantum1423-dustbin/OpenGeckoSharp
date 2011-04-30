@@ -29,3 +29,17 @@ E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\bin\Debug 1.9\OpenGeckoSha
 E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\bin\Debug 1.9\OpenGFX.xml
 E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\OpenGeckoSharp.dll
 E:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\OpenGeckoSharp.pdb
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\bin\Debug 1.9\OpenGeckoSharp.dll
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\bin\Debug 1.9\OpenGeckoSharp.pdb
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\bin\Debug 1.9\OpenGFX.xml
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\ResolveAssemblyReference.cache
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\Skybound.Gecko.ChromeDialog.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\Skybound.Gecko.ConfirmDialog.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\Skybound.Gecko.PasswordDialog.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\Skybound.Gecko.PromptDialog.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\Skybound.Gecko.PropertiesDialog.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\OpenGFX.TestBrowser.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\ResGen.read.1.tlog
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\ResGen.write.1.tlog
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\OpenGeckoSharp.dll
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug 1.8\OpenGeckoSharp.pdb

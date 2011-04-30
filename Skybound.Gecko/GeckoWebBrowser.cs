@@ -2036,6 +2036,7 @@ namespace Skybound.Gecko
 		/// <param name="e">The data for the event.</param>
 		protected virtual void OnDomMouseDown(GeckoDomMouseEventArgs e)
 		{
+            WebBrowserFocus.Activate();
 			if (((GeckoDomMouseEventHandler)this.Events[DomMouseDownEvent]) != null)
 				((GeckoDomMouseEventHandler)this.Events[DomMouseDownEvent])(this, e);
 		}

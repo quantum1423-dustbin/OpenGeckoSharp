@@ -257,7 +257,7 @@ namespace Skybound.Gecko
 		}
 		
 		nsIDOMHTMLElement DomElement;
-		//nsIDOMNSElement DomNSElement;
+		nsIDOMNSElement DomNSElement;
 		nsIDOMNSHTMLElement DomNSHTMLElement;
 		
 		/// <summary>
@@ -392,22 +392,12 @@ namespace Skybound.Gecko
 			
 			DomElement.RemoveAttribute(new nsAString(attributeName));
 		}
-		
-		#if GECKO_1_9_1
 		public int ScrollLeft { get { return DomNSElement.GetScrollLeft(); } set { DomNSElement.SetScrollLeft(value); } }
 		public int ScrollTop { get { return DomNSElement.GetScrollTop(); } set { DomNSElement.SetScrollTop(value); } }
 		public int ScrollWidth { get { return DomNSElement.GetScrollWidth(); } }
 		public int ScrollHeight { get { return DomNSElement.GetScrollHeight(); } }
 		public int ClientWidth { get { return DomNSElement.GetClientWidth(); } }
 		public int ClientHeight { get { return DomNSElement.GetClientHeight(); } }
-		#else
-		public int ScrollLeft { get { return DomNSHTMLElement.GetScrollLeft(); } set { DomNSHTMLElement.SetScrollLeft(value); } }
-		public int ScrollTop { get { return DomNSHTMLElement.GetScrollTop(); } set { DomNSHTMLElement.SetScrollTop(value); } }
-		public int ScrollWidth { get { return DomNSHTMLElement.GetScrollWidth(); } }
-		public int ScrollHeight { get { return DomNSHTMLElement.GetScrollHeight(); } }
-		public int ClientWidth { get { return DomNSHTMLElement.GetClientWidth(); } }
-		public int ClientHeight { get { return DomNSHTMLElement.GetClientHeight(); } }
-		#endif
 		public int OffsetLeft { get { return DomNSHTMLElement.GetOffsetLeft(); } }
 		public int OffsetTop { get { return DomNSHTMLElement.GetOffsetTop(); } }
 		public int OffsetWidth { get { return DomNSHTMLElement.GetOffsetWidth(); } }
