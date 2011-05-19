@@ -403,7 +403,21 @@ namespace Skybound.Gecko
 		/// <param name="url">The url to navigate to.</param>
 		public void Navigate(string url)
 		{
-			Navigate(url, 0, null, null, null);
+            if (url != "about:")
+            {
+                try
+                {
+                    Navigate(url, 0, null, null, null);
+                }
+                catch
+                {
+                    Navigate(this.History[this.History.Count - 5].Url.ToString());
+                }
+            }
+            else
+            {
+                MessageBox.Show("This browser is powered by OpenGeckoSharp 0.6");
+            }
 		}
 		
 		/// <summary>
