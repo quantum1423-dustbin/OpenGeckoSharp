@@ -405,14 +405,7 @@ namespace Skybound.Gecko
 		{
             if (url != "about:")
             {
-                try
-                {
                     Navigate(url, 0, null, null, null);
-                }
-                catch
-                {
-                    Navigate(this.History[this.History.Count - 5].Url.ToString());
-                }
             }
             else
             {
@@ -750,11 +743,19 @@ namespace Skybound.Gecko
 		/// <returns></returns>
 		public bool GoBack()
 		{
-			if (CanGoBack)
-			{
-				WebNav.GoBack();
-				return true;
-			}
+            if (this.Url.ToString() != "http://acid3.acidtests.org")
+            {
+                if (CanGoBack)
+                {
+                    WebNav.GoBack();
+                    return true;
+                }
+            }
+            else
+            {
+                //From DashHax
+                this.Navigate(this.History[this.History.Count - 5].Url.ToString());
+            }
 			return false;
 		}
 		
