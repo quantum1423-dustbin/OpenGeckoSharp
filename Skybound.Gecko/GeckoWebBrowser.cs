@@ -743,7 +743,7 @@ namespace Skybound.Gecko
 		/// <returns></returns>
 		public bool GoBack()
 		{
-            if (this.Url.ToString() != "http://acid3.acidtests.org")
+            try
             {
                 if (CanGoBack)
                 {
@@ -751,7 +751,7 @@ namespace Skybound.Gecko
                     return true;
                 }
             }
-            else
+            catch
             {
                 //From DashHax
                 this.Navigate(this.History[this.History.Count - 5].Url.ToString());
