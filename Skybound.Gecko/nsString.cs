@@ -171,7 +171,61 @@ namespace Skybound.Gecko
 			return "";
 		}
 	}
-	
+	[StructLayout(LayoutKind.Explicit, Size=16)]
+    public class AUTF8String : IDisposable
+    {
+        [DllImport("xpcom", CharSet = CharSet.Unicode)]
+        static extern int NS_StringContainerInit(AUTF8String container);
+        [DllImport("xpcom", CharSet = CharSet.Unicode)]
+        static extern int NS_StringSetData(AUTF8String str, byte[] data, int length);
+        [DllImport("xpcom", CharSet = CharSet.Unicode)]
+        static extern int NS_StringGetData(AUTF8String str, out IntPtr data, IntPtr nullTerm);
+        [DllImport("xpcom", CharSet = CharSet.Unicode)]
+        static extern int NS_StringContainerFinish(AUTF8String Container);
+
+        public AUTF8String()
+        {
+            NS_StringContainerInit(this);
+        }
+        public AUTF8String(string value)
+            : this()
+        {
+            if (value != null)
+            {
+                byte[] utf8 = new byte[Encoding.UTF8.GetByteCount(value) + 1];
+                Encoding.UTF8.GetBytes(value, 0, value.Length, utf8, 0);
+                NS_StringSetData(this, utf8, value.Length);
+            }
+            
+        }
+        ~AUTF8String()
+            {
+                Dispose();
+            }
+
+        public void Dispose()
+        {
+            NS_StringContainerFinish(this);
+            GC.SuppressFinalize(this);
+        }
+
+        public void SetData(byte[] value)
+        {
+            NS_StringSetData(this, value, (value == null) ? 0 : value.Length);
+        }
+
+        public override string ToString()
+        {
+            IntPtr data;
+            int length = NS_StringGetData(this, out data, IntPtr.Zero);
+
+            if (length > 0)
+            {
+                return Marshal.PtrToStringAnsi(data, length);
+            }
+            return "";
+        }
+    }
 	[StructLayout(LayoutKind.Explicit, Size=16)]
 	public class nsACString : IDisposable
 	{

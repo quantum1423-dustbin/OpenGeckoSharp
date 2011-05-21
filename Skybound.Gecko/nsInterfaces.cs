@@ -1824,7 +1824,51 @@ namespace Skybound.Gecko
 		nsIDOMNodeList GetElementsByClassName(nsAString classes);
 		nsIDOMElement ElementFromPoint(int x, int y);
 	}
-	
+    [Guid("AAAB6710-0F2C-11d5-A53B-0010A401EB10"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface nsICookieManager
+    {
+        void removeAll();
+        nsISimpleEnumerator enumerator();
+        void remove(AUTF8String aDomain, nsACString aName, AUTF8String aPath, bool aBlocked);
+    }
+    [Guid("5047cab4-9cb2-4927-a4ab-77422bc3bc67"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface nsICookieManager2 : nsICookieManager
+    {
+        new void removeAll();
+        new nsISimpleEnumerator enumerator();
+        new void remove(AUTF8String aDomain, nsACString aName, AUTF8String aPath, bool aBlocked);
+
+        void add(AUTF8String aDomain, AUTF8String aPath, nsACString aName, nsACString aValue, bool aIsSecure,
+            bool aIsHttpOnly, bool aIsSession, Int64 aExpiry);
+        bool cookieExists(nsICookie2 aCookie);
+        ulong countCookiesFromHost(nsACString aHost);
+        void importCookies(nsIFile aCookieFile);
+    }
+    [Guid("E9FCB9A4-D376-458f-B720-E65E7DF593BC"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface nsICookie
+    {
+        nsACString get_Name();
+        nsACString get_Value();
+        bool get_IsDomain();
+        AUTF8String get_Host();
+        AUTF8String get_Path();
+        bool get_IsSecure();
+    }
+    [Guid("736619fe-8d09-4e59-8223-32f176c22977"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface nsICookie2 : nsICookie
+    {
+        new nsACString get_Name();
+        new nsACString get_Value();
+        new bool get_IsDomain();
+        new AUTF8String get_Host();
+        new AUTF8String get_Path();
+        new bool get_IsSecure();
+
+        AUTF8String get_RawHost();
+        bool get_IsSession();
+        Int64 get_Expiry();
+        bool get_IsHttpOnly();
+    }
 	[Guid("f0aef489-18c5-4de6-99d5-58b3758b098c"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 	interface nsIDOMNSElement
 	{
