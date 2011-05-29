@@ -896,9 +896,7 @@ namespace Skybound.Gecko
 		
 		public void Print()
 		{
-			nsIWebBrowserPrint print = Xpcom.QueryInterface<nsIWebBrowserPrint>(this.DomWindow);
-			
-			print.Print(null, null);
+
 		}
 		
 		public GeckoSelection Selection

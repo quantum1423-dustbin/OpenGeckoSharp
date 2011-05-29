@@ -790,7 +790,13 @@ namespace Skybound.Gecko
 		{
 		    return Reload(GeckoLoadFlags.None);
 		}
-		
+        public void DeleteCookies()
+        {
+            nsICookieManager CookieMan;
+            CookieMan = Xpcom.GetService<nsICookieManager>("@mozilla.org/cookiemanager;1");
+            CookieMan = Xpcom.QueryInterface<nsICookieManager>(CookieMan);
+            CookieMan.removeAll();
+        }
 		/// <summary>
 		/// Reloads the current page using the specified flags.
 		/// </summary>
@@ -1317,18 +1323,21 @@ namespace Skybound.Gecko
         {
             get
             {
-                if (Url.HostNameType == UriHostNameType.Dns)
+                var url = Url;
+                var iconurl = String.Format("http://{0}/favicon.ico", url.Host);
+                try
                 {
-                    // Get the URL of the favicon
-                    // url.Host will return such string as www.google.com
-                    string iconURL = "http://" + Url.Host + "/favicon.ico";
-                    System.Net.WebRequest request = System.Net.HttpWebRequest.Create(iconURL);
-                    System.Net.WebResponse response = request.GetResponse();
-                    System.IO.Stream stream = response.GetResponseStream();
-                    Icon favicon = new Icon(stream);
-                    return favicon as Icon;
+                    var request = System.Net.WebRequest.Create(iconurl);
+                    var response = request.GetResponse();
+                    if (response == null)
+                        return null;
+
+                    var s = response.GetResponseStream();
+                    Image intermediate = Image.FromStream(s);
+                    Bitmap interbediate = new Bitmap(intermediate);
+                    return Icon.FromHandle(interbediate.GetHicon());
                 }
-                else return null;
+                catch { return null; }
             }
         }
 
