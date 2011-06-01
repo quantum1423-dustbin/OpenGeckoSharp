@@ -89,7 +89,6 @@ namespace Skybound.Gecko
 		nsIURIContentListener GetParentContentListener();
 		void SetParentContentListener(nsIURIContentListener aParentContentListener);
 	}
-	
 	static class nsIWebBrowserChromeConstants
 	{
 		public const int STATUS_SCRIPT = 1;

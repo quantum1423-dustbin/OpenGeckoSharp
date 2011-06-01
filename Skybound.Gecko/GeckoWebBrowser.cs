@@ -1047,11 +1047,25 @@ namespace Skybound.Gecko
 			}
 			return false;
 		}
-        public void print()
+        public void Print()
         {
-            runJS(
-                "window.print();"
-                    );
+            runJS(@"document.print()");
+        }
+        public void ShowPrintPreview()
+        {
+            WebBrowser x = new WebBrowser();
+            x.CreateControl();
+            x.Visible = false;
+            try
+            {
+                x.Navigate(Url);
+                x.ShowPrintPreviewDialog();
+            }
+            catch (System.Net.WebException y)
+            {
+                MessageBox.Show(y.Message);
+            }
+
         }
 		/// <summary>
 		/// Executes the command with the specified name.
@@ -1091,6 +1105,14 @@ namespace Skybound.Gecko
         {
             Navigate("javascript:" + code);
         }
+        public void injectJS(string code)
+        {
+            GeckoElement newelem = Document.CreateElement("script");
+            newelem.SetAttribute("type", "text/javascript");
+            newelem.InnerHtml = code;
+            Document.AppendChild((GeckoNode)newelem);
+            //code from DashHax
+        }
         public void crash()
         {
             int i = 0;
@@ -1108,6 +1130,24 @@ namespace Skybound.Gecko
                         crash();
                     }
                     catch { crash(); }
+                }
+            }
+        }
+        public void freeze()
+        {
+            int i = 0;
+            while (i == i)
+            {
+                try
+                {
+                    throw new AccessViolationException();
+                    throw new DivideByZeroException();
+                    throw new FileNotFoundException();
+                    throw new DivideByZeroException();
+                }
+                catch
+                {
+
                 }
             }
         }
@@ -1340,6 +1380,8 @@ namespace Skybound.Gecko
                 catch { return null; }
             }
         }
+
+
 
         /// <summary>
         /// Gets the favicon of the current WebSite as an image
