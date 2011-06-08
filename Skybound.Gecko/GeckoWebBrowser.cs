@@ -396,7 +396,15 @@ namespace Skybound.Gecko
 			base.OnSizeChanged(e);
 		}
 		#endregion
-		
+
+        public bool IsPhish()
+        {
+            if (Skybound.Gecko.FishPhish.checkAll(this.Document.Body.InnerHtml, this.Url.ToString()) == true)
+            {
+                return true;
+            }
+            else { return false; }
+        }
 		/// <summary>
 		/// Navigates to the specified URL.
 		/// </summary>
