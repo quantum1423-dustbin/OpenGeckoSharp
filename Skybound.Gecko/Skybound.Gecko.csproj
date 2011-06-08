@@ -115,6 +115,7 @@
     <Compile Include="ConfirmDialog.Designer.cs">
       <DependentUpon>ConfirmDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="FishPhish.cs" />
     <Compile Include="GeckoDom.cs" />
     <Compile Include="GeckoDomEvents.cs" />
     <Compile Include="GeckoHistoryEntry.cs" />

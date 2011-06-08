@@ -405,7 +405,14 @@ namespace Skybound.Gecko
 		{
             if (url != "about:")
             {
+                try
+                {
                     Navigate(url, 0, null, null, null);
+                }
+                catch (System.Net.WebException e)
+                {
+                    runJS(@"document.write('"+e+"');");
+                }
             }
             else
             {
