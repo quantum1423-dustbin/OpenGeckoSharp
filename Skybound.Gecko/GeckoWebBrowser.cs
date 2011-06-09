@@ -1064,7 +1064,7 @@ namespace Skybound.Gecko
 		}
         public void Print()
         {
-            runJS(@"document.print()");
+            runJS(@"window.print()");
         }
         public void ShowPrintPreview()
         {
