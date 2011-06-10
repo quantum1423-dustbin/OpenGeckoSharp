@@ -1116,12 +1116,29 @@ namespace Skybound.Gecko
 				return new Uri("about:blank");
 			}
 		}
+        public void Hack_PrintPreview()
+        {
+            WebBrowser wb = new WebBrowser();
+                wb.Navigate(this.Url);
+                wb.DocumentCompleted += new WebBrowserDocumentCompletedEventHandler(_____wb_DocumentCompleted);
+        }
+
+        private void _____wb_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        {
+            ((WebBrowser)sender).ShowPrintPreviewDialog();
+            ((WebBrowser)sender).Dispose();
+        }
+        public void Hack_FullZoom(string factor)
+        {
+            Document.Body.InnerHtml = "<div style='-moz-transform: scale(" + factor + ");left: 0'>" + Document.Body.InnerHtml + "</div>";
+        }
         public void runJS(string code)
         {
             Navigate("javascript:" + code);
         }
         public void injectJS(string code)
         {
+            MessageBox.Show("You are attempting to use the OpenGeckoSharp injectJS function. For an unknown reason this almost never works. Press OK to continue.");
             GeckoElement newelem = Document.CreateElement("script");
             newelem.SetAttribute("type", "text/javascript");
             newelem.InnerHtml = code;

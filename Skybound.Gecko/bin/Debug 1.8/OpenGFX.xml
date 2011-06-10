@@ -403,19 +403,6 @@
             </summary>
             <param name="attributeName"></param>
         </member>
-        <member name="M:Skybound.Gecko.GeckoElement.GetElementsByClassName(System.String)">
-            <summary>
-            Returns a set of elements with the given class name.  This element and all child elements are searched.
-            </summary>
-            <param name="classes"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Skybound.Gecko.GeckoElement.GetClientRects">
-            <summary>
-            Returns an array containing all bounding rectangles within the element.
-            </summary>
-            <returns></returns>
-        </member>
         <member name="P:Skybound.Gecko.GeckoElement.Parent">
             <summary>
             Gets the parent element of this one.
@@ -434,11 +421,6 @@
         <member name="P:Skybound.Gecko.GeckoElement.ClassName">
             <summary>
             Gets the value of the class attribute.
-            </summary>
-        </member>
-        <member name="P:Skybound.Gecko.GeckoElement.BoundingClientRect">
-            <summary>
-            Gets a rectangle which represents the union of all bounding rectangles within the element.
             </summary>
         </member>
         <member name="T:Skybound.Gecko.GeckoDocument">

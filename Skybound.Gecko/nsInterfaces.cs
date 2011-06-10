@@ -1867,29 +1867,79 @@ namespace Skybound.Gecko
         Int64 get_Expiry();
         bool get_IsHttpOnly();
     }
-	[Guid("f0aef489-18c5-4de6-99d5-58b3758b098c"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	interface nsIDOMNSElement
-	{
-		nsIDOMNodeList GetElementsByClassName(nsAString classes);
-		nsIDOMClientRectList GetClientRects();
-		nsIDOMClientRect GetBoundingClientRect();
-		int GetScrollTop();
-		void SetScrollTop(int value);
-		int GetScrollLeft();
-		void SetScrollLeft(int value);
-		int GetScrollHeight();
-		int GetScrollWidth();
-		int GetClientTop();
-		int GetClientLeft();
-		int GetClientHeight();
-		int GetClientWidth();
-		nsIDOMElement GetFirstElementChild();
-		nsIDOMElement GetLastElementChild();
-		nsIDOMElement GetPreviousElementSibling();
-		nsIDOMElement GetNextElementSibling();
-		int GetChildElementCount();
-		nsIDOMNodeList GetChildren();
-	}
+    [Guid("c9da11bc-32d4-425e-A91f-7e0939c39251"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    interface nsIDOMNSElement
+    {
+        [return: MarshalAs(UnmanagedType.Interface)]
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        nsIDOMNodeList GetElementsByClassName([MarshalAs(UnmanagedType.LPStruct)] nsAString classes);
+
+        [return: MarshalAs(UnmanagedType.Interface)]
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        nsIDOMClientRectList GetClientRects();
+
+        [return: MarshalAs(UnmanagedType.Interface)]
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        nsIDOMClientRect GetBoundingClientRect();
+
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        int GetScrollTop();
+
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        void SetScrollTop(int value);
+
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        int GetScrollLeft();
+
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        void SetScrollLeft(int value);
+
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        int GetScrollHeight();
+
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        int GetScrollWidth();
+
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        int GetClientTop();
+
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        int GetClientLeft();
+
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        int GetClientHeight();
+
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        int GetClientWidth();
+
+        [return: MarshalAs(UnmanagedType.Interface)]
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        nsIDOMElement GetFirstElementChild();
+
+        [return: MarshalAs(UnmanagedType.Interface)]
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        nsIDOMElement GetLastElementChild();
+
+        [return: MarshalAs(UnmanagedType.Interface)]
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        nsIDOMElement GetPreviousElementSibling();
+
+        [return: MarshalAs(UnmanagedType.Interface)]
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        nsIDOMElement GetNextElementSibling();
+
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        int GetChildElementCount();
+
+        [return: MarshalAs(UnmanagedType.Interface)]
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        nsIDOMNodeList GetChildren();
+
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        /* nsIDOMDOMTokenList */
+        IntPtr GetClassList();
+    }
+
 	
 	#if GECKO_1_9_1
 	[Guid("B2F824C4-D9D3-499B-8D3B-45C8245497C6"), ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
