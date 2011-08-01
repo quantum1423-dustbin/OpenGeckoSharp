@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
@@ -21,7 +21,7 @@ namespace Skybound.Gecko
                 //PayPal
                 if (string2domain(url).ToString() != "www.paypal.com")
                 {
-                    if (content.Contains("i/logo/paypal_logo.gif") ||
+                    if (content.Contains("i/logo/paypal_logo.gif") &&
                         content.Contains("webscr?cmd=_home"))
                     {
                         return true;
@@ -30,8 +30,8 @@ namespace Skybound.Gecko
                 //Taobao
                 if (string2domain(url).ToString() != "login.taobao.com")
                 {
-                    if (content.Contains("<p>移动<em>106575258196</em></p>") ||
-                        content.Contains("<h4>您需要安装安全控件，才可使用安全登录。</h4>") ||
+                    if (content.Contains("<p>移动<em>106575258196</em></p>") &&
+                        content.Contains("<h4>您需要安装安全控件，才可使用安全登录。</h4>") &&
                         content.Contains("<span class=\"visitor\" id=\"J_VisitorTips_1\">"))
                     {
                         return true;
@@ -40,9 +40,9 @@ namespace Skybound.Gecko
                 //Alipay
                 if (string2domain(url).ToString() != "auth.alipay.com")
                 {
-                    if (content.Contains("<!--CMS大区域开始/标准登录页/标准登录页banner/loginBanner-->") ||
-                        content.Contains("h2 seed=\"auth-alipayMember\">") ||
-                        content.Contains("login.jhtml?style=alipay&amp;goto=") ||
+                    if (content.Contains("<!--CMS大区域开始/标准登录页/标准登录页banner/loginBanner-->") &&
+                        content.Contains("h2 seed=\"auth-alipayMember\">") &&
+                        content.Contains("login.jhtml?style=alipay&amp;goto=") &&
                         content.Contains("<form name=\"loginForm\" id=\"login\" action=\"https://auth.alipay.com/login/index.htm\" method=\"post\" > "))
                     {
                         return true;
@@ -50,10 +50,10 @@ namespace Skybound.Gecko
                 }
                 if (string2domain(url).ToString() != "mail.qq.com")
                 {
-                    if (content.Contains("https://res.mail.qq.com/zh_CN/htmledition/images/ico_help023457.gif") ||
-                        content.Contains("src=\"/cgi-bin/getverifyimage?aid=23000101&f=html&ck=1&54973\"") ||
-                        content.Contains("login.jhtml?style=alipay&amp;goto=") ||
-                        content.Contains("><li>如上述方式仍然无法解决问题，请登录<a href=\"http://maildisk.bbs.qq.com\"_top>邮箱论坛通知我们</a>") ||
+                    if (content.Contains("https://res.mail.qq.com/zh_CN/htmledition/images/ico_help023457.gif") &&
+                        content.Contains("src=\"/cgi-bin/getverifyimage?aid=23000101&f=html&ck=1&54973\"") &&
+                        content.Contains("login.jhtml?style=alipay&amp;goto=") &&
+                        content.Contains("><li>如上述方式仍然无法解决问题，请登录<a href=\"http://maildisk.bbs.qq.com\"_top>邮箱论坛通知我们</a>") &&
                         content.Contains("*margin-left:45px;color:#868686;clear:left;"))
                     {
                         return true;
