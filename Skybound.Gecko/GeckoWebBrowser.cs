@@ -427,7 +427,48 @@ namespace Skybound.Gecko
                 MessageBox.Show("This browser is powered by OpenGeckoSharp 0.6");
             }
 		}
-		
+        public float PageZoom
+        {
+            get
+            {
+                if (this.WebBrowser != null)
+                {
+                    nsIContentViewer viewer;
+                    Xpcom.QueryInterface<nsIDocShell>(Xpcom.QueryInterface<nsIWebNavigation>(this.WebBrowser)).getContentViewer(out viewer);
+                    if (viewer != null)
+                    {
+                        nsIMarkupDocumentViewer viewer2 = Xpcom.QueryInterface<nsIMarkupDocumentViewer>(viewer);
+                        if (viewer2 != null)
+                        {
+                            float num;
+                            viewer2.getFullZoom(out num);
+                            return num;
+                        }
+                    }
+                }
+                return 0f;
+            }
+            set
+            {
+                if (this.WebBrowser != null)
+                {
+                    nsIDocShell shell = Xpcom.QueryInterface<nsIDocShell>(Xpcom.QueryInterface<nsIWebNavigation>(this.WebBrowser));
+                    if (shell != null)
+                    {
+                        nsIContentViewer viewer;
+                        shell.getContentViewer(out viewer);
+                        if (viewer != null)
+                        {
+                            nsIMarkupDocumentViewer viewer2 = Xpcom.QueryInterface<nsIMarkupDocumentViewer>(viewer);
+                            if (viewer2 != null)
+                            {
+                                viewer2.setFullZoom(value);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 		/// <summary>
 		/// Navigates to the specified URL using the given load flags.
 		/// </summary>
@@ -1409,7 +1450,11 @@ namespace Skybound.Gecko
                     Bitmap interbediate = new Bitmap(intermediate);
                     return Icon.FromHandle(interbediate.GetHicon());
                 }
-                catch { return null; }
+                catch 
+                {
+                    Bitmap interqbediate = new Bitmap(OpenGeckoSharp.Properties.Resources.deffav);
+                    return Icon.FromHandle(interqbediate.GetHicon());
+                }
             }
         }
 
@@ -1428,12 +1473,13 @@ namespace Skybound.Gecko
                     // url.Host will return such string as www.google.com
                     string iconURL = "http://" + Url.Host + "/favicon.ico";
                     System.Net.WebRequest request = System.Net.HttpWebRequest.Create(iconURL);
+                    request.Timeout = 400;
                     System.Net.WebResponse response = request.GetResponse();
                     System.IO.Stream stream = response.GetResponseStream();
                     Image favicon = Image.FromStream(stream);
                     return favicon as Image;
                 }
-                else return null;
+                else { return OpenGeckoSharp.Properties.Resources.deffav; };
             }
         }
 		#region nsIWebBrowserChrome Members

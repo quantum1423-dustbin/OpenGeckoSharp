@@ -126,7 +126,17 @@
     <Compile Include="GeckoWebBrowser.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="nsIContentViewer.cs" />
+    <Compile Include="nsIDocShell.cs" />
+    <Compile Include="nsIDocShellLoadInfo.cs" />
+    <Compile Include="nsIDocumentCharsetInfo.cs" />
+    <Compile Include="nsIDOMStorage.cs" />
+    <Compile Include="nsIMarkupDocumentViewer.cs" />
     <Compile Include="nsInterfaces.cs" />
+    <Compile Include="nsIPrintSession.cs" />
+    <Compile Include="nsIPrintSettings.cs" />
+    <Compile Include="nsISecureBrowserUI.cs" />
+    <Compile Include="nsISHEntry.cs" />
     <Compile Include="nsString.cs" />
     <Compile Include="nsURI.cs" />
     <Compile Include="PasswordDialog.cs">
@@ -149,6 +159,11 @@
       <DependentUpon>PropertiesDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="TestBrowser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -178,12 +193,18 @@
       <DependentUpon>PropertiesDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="TestBrowser.resx">
       <DependentUpon>TestBrowser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Readme.txt" />
+    <None Include="Resources\001_40.png" />
+    <EmbeddedResource Include="Resources\deffav.bmp" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
