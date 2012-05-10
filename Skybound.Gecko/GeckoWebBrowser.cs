@@ -41,7 +41,6 @@ using System.Windows.Forms;
 using System.IO;
 using System.Reflection;
 using System.Diagnostics;
-using System.Text;
 
 namespace Skybound.Gecko
 {
@@ -162,6 +161,9 @@ namespace Skybound.Gecko
 				{
 					// navigating to about:blank allows drag & drop to work properly before a page has been loaded into the browser
 					Navigate("about:blank");
+					/// <summary>
+					/// Unuseful and messes up with MDITabControl
+					/// </summary>
 				}	
 				
 				// this fix prevents the browser from crashing if the first page loaded is invalid (missing file, invalid URL, etc)
@@ -195,16 +197,16 @@ namespace Skybound.Gecko
 				GeckoWindowFlags flags = (GeckoWindowFlags)chromeFlags;
 				if ((flags & GeckoWindowFlags.OpenAsChrome) != 0)
 				{
-				      // obtain the services we need
-				      nsIAppShellService appShellService = Xpcom.GetService<nsIAppShellService>("@mozilla.org/appshell/appShellService;1");
-				      object appShell = Xpcom.GetService(new Guid("2d96b3df-c051-11d1-a827-0040959a28c9"));
-				      
-				      // create the child window
-				      nsIXULWindow xulChild = appShellService.CreateTopLevelWindow(null, null, chromeFlags, -1, -1, appShell);
-				      
-				      // this little gem allows the GeckoWebBrowser to be properly activated when it gains the focus again
-				      if (parent is GeckoWebBrowser && (flags & GeckoWindowFlags.OpenAsDialog) != 0)
-				      {
+					  // obtain the services we need
+					  nsIAppShellService appShellService = Xpcom.GetService<nsIAppShellService>("@mozilla.org/appshell/appShellService;1");
+					  object appShell = Xpcom.GetService(new Guid("2d96b3df-c051-11d1-a827-0040959a28c9"));
+					  
+					  // create the child window
+					  nsIXULWindow xulChild = appShellService.CreateTopLevelWindow(null, null, chromeFlags, -1, -1, appShell);
+					  
+					  // this little gem allows the GeckoWebBrowser to be properly activated when it gains the focus again
+					  if (parent is GeckoWebBrowser && (flags & GeckoWindowFlags.OpenAsDialog) != 0)
+					  {
 						EventHandler gotFocus = null;
 						gotFocus = delegate (object sender, EventArgs e)
 						{
@@ -212,10 +214,10 @@ namespace Skybound.Gecko
 							(sender as GeckoWebBrowser).WebBrowserFocus.Activate();
 						};
 						(parent as GeckoWebBrowser).GotFocus += gotFocus;
-				      }
-				      
-				      // return the chrome
-				      return Xpcom.QueryInterface<nsIWebBrowserChrome>(xulChild);
+					  }
+					  
+					  // return the chrome
+					  return Xpcom.QueryInterface<nsIWebBrowserChrome>(xulChild);
 				}
 				
 				GeckoWebBrowser browser = parent as GeckoWebBrowser;
@@ -250,7 +252,7 @@ namespace Skybound.Gecko
 				using (Brush brush = new System.Drawing.Drawing2D.HatchBrush(System.Drawing.Drawing2D.HatchStyle.SolidDiamond, Color.FromArgb(240, 240, 240), Color.White))
 					e.Graphics.FillRectangle(brush, this.ClientRectangle);
 				
-				e.Graphics.DrawString("All About Stuff OpenGFX v" + versionString + "\r\n" + copyright + "\r\n" + "http://www.geckofx.org", SystemFonts.MessageBoxFont, Brushes.Black,
+				e.Graphics.DrawString("OpenGeckoSharp v" + versionString + "\r\n" + copyright + "\r\n" + "http://devatan.tk/", SystemFonts.MessageBoxFont, Brushes.Black,
 					new RectangleF(2, 2, this.Width-4, this.Height-4));
 				e.Graphics.DrawRectangle(SystemPens.ControlDark, 0, 0, Width-1, Height-1);
 			}
@@ -373,17 +375,17 @@ namespace Skybound.Gecko
 
 		protected override void OnEnter(EventArgs e)
 		{
-		      WebBrowserFocus.Activate();
-		      
-		      base.OnEnter(e);
+			  WebBrowserFocus.Activate();
+			  
+			  base.OnEnter(e);
 		}
 
 		protected override void OnLeave(EventArgs e)
 		{
-		      if (!IsBusy)
-		            WebBrowserFocus.Deactivate();
-		           
-		      base.OnLeave(e);
+			  if (!IsBusy)
+					WebBrowserFocus.Deactivate();
+				   
+			  base.OnLeave(e);
 		}
 
 		protected override void OnSizeChanged(EventArgs e)
@@ -397,78 +399,279 @@ namespace Skybound.Gecko
 		}
 		#endregion
 
-        public bool IsPhish()
-        {
-            if (Skybound.Gecko.FishPhish.checkAll(this.Document.Body.InnerHtml, this.Url.ToString()) == true)
-            {
-                return true;
-            }
-            else { return false; }
-        }
+		public bool IsPhishingSite
+		{
+			get
+			{
+				if (Skybound.Gecko.FishPhish.CheckAll(this.Document.Body.InnerHtml, this.Url.ToString()) == true)
+				{
+					return true;
+				}
+				else { return false; }
+			}
+		}
 		/// <summary>
 		/// Navigates to the specified URL.
 		/// </summary>
 		/// <param name="url">The url to navigate to.</param>
 		public void Navigate(string url)
 		{
-            if (url != "about:")
+			if (url != "about:" && url != "about:ogs")
+			{
+				try
+				{
+					Navigate(url, 0, null, null, null);
+				}
+				catch (System.Net.WebException e)
+				{
+					RunJS(@"document.write('An error occurred. The exact error message is:<br><br>"+ e.Message.Replace("\n", "<br>") +"');");
+				}
+			}
+			else
             {
-                try
-                {
-                    Navigate(url, 0, null, null, null);
-                }
-                catch (System.Net.WebException e)
-                {
-                    runJS(@"document.write('"+e+"');");
-                }
-            }
-            else
-            {
-                MessageBox.Show("This browser is powered by OpenGeckoSharp 0.6");
-            }
+                // Code and document by intelloTech.
+
+                Document.Body.InnerHtml = string.Empty;
+                _DocumentTitle = "About OpenGeckoSharp";
+                RunJS(@"document.write('
+<!DOCTYPE html>
+<head>
+<title>About OpenGeckoSharp</title>
+</head>
+
+<body style=""font-family: Arial, Helvetica, sans-serif; width: 100%; height: 100%; margin: none; font-size: auto;"">
+<h2>About OpenGeckoSharp</h2>
+
+<h3>Version info</h3>
+
+You are using version " + ((AssemblyFileVersionAttribute)Attribute.GetCustomAttribute(GetType().Assembly, typeof(AssemblyFileVersionAttribute))).Version + @".
+
+<h3>Credits</h3>
+
+<b>Code base:</b><br>
+<br>
+Skybound Software<br>
+Mozilla Foundation<br>
+<br>
+<b>Modified by:</b><br>
+<br>
+AluSoft (Eric Dong): <a href=""http://alusoft.tk/"">http://alusoft.tk/</a><br>
+intelloTech Technologies (Alexey Gavryushin): <a href=""http://int.no-ip.org/"">http://int.no-ip.org/</a><br>
+Tom Hindle<br>
+DashHax<br>
+
+<h3>License</h3>
+ 
+<h4><a name=""section0""></a>0. Additional Definitions.</h4>
+ 
+<p>As used herein, &ldquo;this License&rdquo; refers to version 3 of the GNU Lesser 
+General Public License, and the &ldquo;GNU GPL&rdquo; refers to version 3 of the GNU 
+General Public License.</p>
+ 
+<p>&ldquo;The Library&rdquo; refers to a covered work governed by this License, 
+other than an Application or a Combined Work as defined below.</p>
+ 
+<p>An &ldquo;Application&rdquo; is any work that makes use of an interface provided 
+by the Library, but which is not otherwise based on the Library. 
+Defining a subclass of a class defined by the Library is deemed a mode 
+of using an interface provided by the Library.</p>
+ 
+<p>A &ldquo;Combined Work&rdquo; is a work produced by combining or linking an 
+Application with the Library.  The particular version of the Library 
+with which the Combined Work was made is also called the &ldquo;Linked 
+Version&rdquo;.</p>
+ 
+<p>The &ldquo;Minimal Corresponding Source&rdquo; for a Combined Work means the 
+Corresponding Source for the Combined Work, excluding any source code 
+for portions of the Combined Work that, considered in isolation, are 
+based on the Application, and not on the Linked Version.</p>
+ 
+<p>The &ldquo;Corresponding Application Code&rdquo; for a Combined Work means the 
+object code and/or source code for the Application, including any data 
+and utility programs needed for reproducing the Combined Work from the 
+Application, but excluding the System Libraries of the Combined Work.</p>
+ 
+<h4><a name=""section1""></a>1. Exception to Section 3 of the GNU GPL.</h4>
+ 
+<p>You may convey a covered work under sections 3 and 4 of this License 
+without being bound by section 3 of the GNU GPL.</p>
+ 
+<h4><a name=""section2""></a>2. Conveying Modified Versions.</h4>
+ 
+<p>If you modify a copy of the Library, and, in your modifications, a 
+facility refers to a function or data to be supplied by an Application 
+that uses the facility (other than as an argument passed when the 
+facility is invoked), then you may convey a copy of the modified 
+version:</p> 
+ 
+<ul>
+<li>a) under this License, provided that you make a good faith effort to 
+   ensure that, in the event an Application does not supply the 
+   function or data, the facility still operates, and performs 
+   whatever part of its purpose remains meaningful, or</li> 
+ 
+<li>b) under the GNU GPL, with none of the additional permissions of 
+   this License applicable to that copy.</li> 
+</ul>
+ 
+<h4><a name=""section3""></a>3. Object Code Incorporating Material from Library Header Files.</h4>
+ 
+<p>The object code form of an Application may incorporate material from 
+a header file that is part of the Library.  You may convey such object 
+code under terms of your choice, provided that, if the incorporated 
+material is not limited to numerical parameters, data structure 
+layouts and accessors, or small macros, inline functions and templates 
+(ten or fewer lines in length), you do both of the following:</p> 
+ 
+<ul>
+<li>a) Give prominent notice with each copy of the object code that the 
+   Library is used in it and that the Library and its use are 
+   covered by this License.</li> 
+ 
+<li>b) Accompany the object code with a copy of the GNU GPL and this license 
+   document.</li>
+</ul>
+ 
+<h4><a name=""section4""></a>4. Combined Works.</h4>
+ 
+<p>You may convey a Combined Work under terms of your choice that, 
+taken together, effectively do not restrict modification of the 
+portions of the Library contained in the Combined Work and reverse 
+engineering for debugging such modifications, if you also do each of 
+the following:</p>
+ 
+<ul>
+<li>a) Give prominent notice with each copy of the Combined Work that 
+   the Library is used in it and that the Library and its use are 
+   covered by this License.</li>
+ 
+<li>b) Accompany the Combined Work with a copy of the GNU GPL and this license 
+   document.</li>
+ 
+<li>c) For a Combined Work that displays copyright notices during 
+   execution, include the copyright notice for the Library among 
+   these notices, as well as a reference directing the user to the 
+   copies of the GNU GPL and this license document.</li>
+ 
+<li>d) Do one of the following:
+ 
+<ul>
+<li>0) Convey the Minimal Corresponding Source under the terms of this 
+       License, and the Corresponding Application Code in a form 
+       suitable for, and under terms that permit, the user to 
+       recombine or relink the Application with a modified version of 
+       the Linked Version to produce a modified Combined Work, in the 
+       manner specified by section 6 of the GNU GPL for conveying 
+       Corresponding Source.</li>
+ 
+<li>1) Use a suitable shared library mechanism for linking with the 
+       Library.  A suitable mechanism is one that (a) uses at run time 
+       a copy of the Library already present on the user&rsquo;s comput er
+       system, and (b) will operate properly with a modified version 
+       of the Library that is interface-compatible with the Linked 
+       Version.</li>
+</ul></li>
+ 
+<li>e) Provide Installation Information, but only if you would otherwise 
+   be required to provide such information under section 6 of the 
+   GNU GPL, and only to the extent that such information is 
+   necessary to install and execute a modified version of the 
+   Combined Work produced by recombining or relinking the 
+   Application with a modified version of the Linked Version. (If 
+   you use option 4d0, the Installation Information must accompany 
+   the Minimal Corresponding Source and Corresponding Application 
+   Code. If you use option 4d1, you must provide the Installation 
+   Information in the manner specified by section 6 of the GNU GPL 
+   for conveying Corresponding Source.)</li>
+</ul>
+ 
+<h4><a name=""section5""></a>5. Combined Libraries.</h4>
+ 
+<p>You may place library facilities that are a work based on the 
+Library side by side in a single library together with other library 
+facilities that are not Applications and are not covered by this 
+License, and convey such a combined library under terms of your 
+choice, if you do both of the following:</p> 
+ 
+<ul>
+<li>a) Accompany the combined library with a copy of the same work based 
+   on the Library, uncombined with any other library facilities, 
+   conveyed under the terms of this License.</li> 
+ 
+<li>b) Give prominent notice with the combined library that part of it 
+   is a work based on the Library, and explaining where to find the 
+   accompanying uncombined form of the same work.</li> 
+</ul>
+ 
+<h4><a name=""section6""></a>6. Revised Versions of the GNU Lesser General Public License.</h4>
+ 
+<p>The Free Software Foundation may publish revised and/or new versions 
+of the GNU Lesser General Public License from time to time. Such new 
+versions will be similar in spirit to the present version, but may 
+differ in detail to address new problems or concerns.</p> 
+ 
+<p>Each version is given a distinguishing version number. If the 
+Library as you received it specifies that a certain numbered version 
+of the GNU Lesser General Public License &ldquo;or any later version&rdquo; 
+applies to it, you have the option of following the terms and 
+conditions either of that published version or of any later version 
+published by the Free Software Foundation. If the Library as you 
+received it does not specify a version number of the GNU Lesser 
+General Public License, you may choose any version of the GNU Lesser 
+General Public License ever published by the Free Software Foundation.</p> 
+ 
+<p>If the Library as you received it specifies that a proxy can decide 
+whether future versions of the GNU Lesser General Public License shall 
+apply, that proxy&rsquo;s public statement of acceptance of any version is 
+permanent authorization for you to choose that version for the 
+Library.</p>
+</body>
+</html>
+');");
+			}
 		}
-        public float PageZoom
-        {
-            get
-            {
-                if (this.WebBrowser != null)
-                {
-                    nsIContentViewer viewer;
-                    Xpcom.QueryInterface<nsIDocShell>(Xpcom.QueryInterface<nsIWebNavigation>(this.WebBrowser)).getContentViewer(out viewer);
-                    if (viewer != null)
-                    {
-                        nsIMarkupDocumentViewer viewer2 = Xpcom.QueryInterface<nsIMarkupDocumentViewer>(viewer);
-                        if (viewer2 != null)
-                        {
-                            float num;
-                            viewer2.getFullZoom(out num);
-                            return num;
-                        }
-                    }
-                }
-                return 0f;
-            }
-            set
-            {
-                if (this.WebBrowser != null)
-                {
-                    nsIDocShell shell = Xpcom.QueryInterface<nsIDocShell>(Xpcom.QueryInterface<nsIWebNavigation>(this.WebBrowser));
-                    if (shell != null)
-                    {
-                        nsIContentViewer viewer;
-                        shell.getContentViewer(out viewer);
-                        if (viewer != null)
-                        {
-                            nsIMarkupDocumentViewer viewer2 = Xpcom.QueryInterface<nsIMarkupDocumentViewer>(viewer);
-                            if (viewer2 != null)
-                            {
-                                viewer2.setFullZoom(value);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+		public float PageZoom
+		{
+			get
+			{
+				if (this.WebBrowser != null)
+				{
+					nsIContentViewer viewer;
+					Xpcom.QueryInterface<nsIDocShell>(Xpcom.QueryInterface<nsIWebNavigation>(this.WebBrowser)).getContentViewer(out viewer);
+					if (viewer != null)
+					{
+						nsIMarkupDocumentViewer viewer2 = Xpcom.QueryInterface<nsIMarkupDocumentViewer>(viewer);
+						if (viewer2 != null)
+						{
+							float num;
+							viewer2.getFullZoom(out num);
+							return num;
+						}
+					}
+				}
+				return 0f;
+			}
+			set
+			{
+				if (this.WebBrowser != null)
+				{
+					nsIDocShell shell = Xpcom.QueryInterface<nsIDocShell>(Xpcom.QueryInterface<nsIWebNavigation>(this.WebBrowser));
+					if (shell != null)
+					{
+						nsIContentViewer viewer;
+						shell.getContentViewer(out viewer);
+						if (viewer != null)
+						{
+							nsIMarkupDocumentViewer viewer2 = Xpcom.QueryInterface<nsIMarkupDocumentViewer>(viewer);
+							if (viewer2 != null)
+							{
+								viewer2.setFullZoom(value);
+							}
+						}
+					}
+				}
+			}
+		}
 		/// <summary>
 		/// Navigates to the specified URL using the given load flags.
 		/// </summary>
@@ -528,7 +731,7 @@ namespace Skybound.Gecko
 					if (!additionalHeaders.EndsWith("\r\n"))
 						additionalHeaders += "\r\n";
 					
-					headersStream = ByteArrayInputStream.Create(Encoding.UTF8.GetBytes(additionalHeaders));
+					headersStream = ByteArrayInputStream.Create(System.Text.Encoding.UTF8.GetBytes(additionalHeaders));
 				}
 				
 				nsIURI referrerUri = null;
@@ -596,14 +799,14 @@ namespace Skybound.Gecko
 				
 				if (length > 0)
 				{
-				      nsWriteSegmentFun fun = (nsWriteSegmentFun)Marshal.GetDelegateForFunctionPointer(aWriter, typeof(nsWriteSegmentFun));
-				      
-				      fixed (byte * data = &Data[Position])
-				      {
+					  nsWriteSegmentFun fun = (nsWriteSegmentFun)Marshal.GetDelegateForFunctionPointer(aWriter, typeof(nsWriteSegmentFun));
+					  
+					  fixed (byte * data = &Data[Position])
+					  {
 						int result = fun(this, aClosure, (IntPtr)data, Position, length, out writeCount);
-				      }
-				      
-				      Position += writeCount;
+					  }
+					  
+					  Position += writeCount;
 				}
 				
 				return writeCount;
@@ -799,19 +1002,19 @@ namespace Skybound.Gecko
 		/// <returns></returns>
 		public bool GoBack()
 		{
-            try
-            {
-                if (CanGoBack)
-                {
-                    WebNav.GoBack();
-                    return true;
-                }
-            }
-            catch
-            {
-                //From DashHax
-                this.Navigate(this.History[this.History.Count - 5].Url.ToString());
-            }
+			try
+			{
+				if (CanGoBack)
+				{
+					WebNav.GoBack();
+					return true;
+				}
+			}
+			catch
+			{
+				//From DashHax
+				this.Navigate(this.History[this.History.Count - 5].Url.ToString());
+			}
 			return false;
 		}
 		
@@ -844,15 +1047,15 @@ namespace Skybound.Gecko
 		/// <returns></returns>
 		public bool Reload()
 		{
-		    return Reload(GeckoLoadFlags.None);
+			return Reload(GeckoLoadFlags.None);
 		}
-        public void DeleteCookies()
-        {
-            nsICookieManager CookieMan;
-            CookieMan = Xpcom.GetService<nsICookieManager>("@mozilla.org/cookiemanager;1");
-            CookieMan = Xpcom.QueryInterface<nsICookieManager>(CookieMan);
-            CookieMan.removeAll();
-        }
+		public void DeleteCookies()
+		{
+			nsICookieManager CookieMan;
+			CookieMan = Xpcom.GetService<nsICookieManager>("@mozilla.org/cookiemanager;1");
+			CookieMan = Xpcom.QueryInterface<nsICookieManager>(CookieMan);
+			CookieMan.removeAll();
+		}
 		/// <summary>
 		/// Reloads the current page using the specified flags.
 		/// </summary>
@@ -1103,26 +1306,26 @@ namespace Skybound.Gecko
 			}
 			return false;
 		}
-        public void Print()
-        {
-            runJS(@"window.print()");
-        }
-        public void ShowPrintPreview()
-        {
-            WebBrowser x = new WebBrowser();
-            x.CreateControl();
-            x.Visible = false;
-            try
-            {
-                x.Navigate(Url);
-                x.ShowPrintPreviewDialog();
-            }
-            catch (System.Net.WebException y)
-            {
-                MessageBox.Show(y.Message);
-            }
+		public void Print()
+		{
+			RunJS(@"window.print()");
+		}
+		public void ShowPrintPreview()
+		{
+			WebBrowser x = new WebBrowser();
+			x.CreateControl();
+			x.Visible = false;
+			try
+			{
+				x.Navigate(Url);
+				x.ShowPrintPreviewDialog();
+			}
+			catch (System.Net.WebException y)
+			{
+				MessageBox.Show(y.Message);
+			}
 
-        }
+		}
 		/// <summary>
 		/// Executes the command with the specified name.
 		/// </summary>
@@ -1157,73 +1360,98 @@ namespace Skybound.Gecko
 				return new Uri("about:blank");
 			}
 		}
-        public void Hack_PrintPreview()
-        {
-            WebBrowser wb = new WebBrowser();
-                wb.Navigate(this.Url);
-                wb.DocumentCompleted += new WebBrowserDocumentCompletedEventHandler(_____wb_DocumentCompleted);
-        }
 
-        private void _____wb_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-        {
-            ((WebBrowser)sender).ShowPrintPreviewDialog();
-            ((WebBrowser)sender).Dispose();
-        }
-        public void Hack_FullZoom(string factor)
-        {
-            Document.Body.InnerHtml = "<div style='-moz-transform: scale(" + factor + ");left: 0'>" + Document.Body.InnerHtml + "</div>";
-        }
-        public void runJS(string code)
-        {
-            Navigate("javascript:" + code);
-        }
-        public void injectJS(string code)
-        {
-            MessageBox.Show("You are attempting to use the OpenGeckoSharp injectJS function. For an unknown reason this almost never works. Press OK to continue.");
-            GeckoElement newelem = Document.CreateElement("script");
-            newelem.SetAttribute("type", "text/javascript");
-            newelem.InnerHtml = code;
-            Document.AppendChild((GeckoNode)newelem);
-            //code from DashHax
-        }
-        public void crash()
-        {
-            int i = 0;
-            while (i == i)
-            {
-                try
-                {
-                    throw new AccessViolationException();
-                    throw new DivideByZeroException();
-                    throw new FileNotFoundException();
-                    throw new DivideByZeroException();
-                }catch{
-                    try
-                    {
-                        crash();
-                    }
-                    catch { crash(); }
-                }
-            }
-        }
-        public void freeze()
-        {
-            int i = 0;
-            while (i == i)
-            {
-                try
-                {
-                    throw new AccessViolationException();
-                    throw new DivideByZeroException();
-                    throw new FileNotFoundException();
-                    throw new DivideByZeroException();
-                }
-                catch
-                {
+		void PrintPreviewInSeparateThread()
+		{
+			WebBrowser wb = new WebBrowser();
+				wb.DocumentCompleted += new WebBrowserDocumentCompletedEventHandler(_____wb_DocumentCompleted);
+				wb.DocumentText = "<!DOCTYPE html><head><title>" + Document.Title + "</title></head><body>" + this.Document.Body.InnerHtml + "</body></html>";
+			// Code by intelloTech
+		}
 
-                }
-            }
-        }
+		/// <summary>
+		/// Shows a print preview of the current page.
+		/// Caution: This method is a surrogate. It may slow down the web browser for a few moments.
+		/// </summary>
+		public void PrintPreview()
+		{
+			System.Threading.Thread tr = new System.Threading.Thread(PrintPreviewInSeparateThread);
+			tr.Start();
+			// Code by intelloTech
+		}
+		
+		//compatibility
+		public void Hack_PrintPreview()
+		{
+			PrintPreview();
+		}
+		
+		//compatibility
+		public void injectJS(string j)
+		{
+			InjectJS(j);
+		}
+		
+		//compatibility
+		public void runJS(string j)
+		{
+			RunJS(j);
+		}
+		private void _____wb_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+		{
+			((WebBrowser)sender).ShowPrintPreviewDialog();
+			((WebBrowser)sender).Dispose();
+		}
+		public void Hack_FullZoom(string factor)
+		{
+			Document.Body.InnerHtml = "<div style='-moz-transform: scale(" + factor + ");left: 0'>" + Document.Body.InnerHtml + "</div>";
+		}
+		public void RunJS(string code)
+		{
+			Navigate("javascript:" + code);
+		}
+		public void InjectJS(string code)
+		{
+			Document.Body.InnerHtml += "<script type=\"javascript\">" + code + "</script>"; // Code by intelloTech
+		}
+		public void Crash()
+		{
+			int i = 0;
+			while (i == 0)
+			{
+				try
+				{
+					throw new AccessViolationException();
+					throw new DivideByZeroException();
+					throw new FileNotFoundException();
+					throw new DivideByZeroException();
+				}catch{
+					try
+					{
+						Crash();
+					}
+					catch { Crash(); }
+				}
+			}
+		}
+		public void Freeze()
+		{
+			int i = 0;
+			while (i == 0)
+			{
+				try
+				{
+					throw new AccessViolationException();
+					throw new DivideByZeroException();
+					throw new FileNotFoundException();
+					throw new DivideByZeroException();
+				}
+				catch
+				{
+
+				}
+			}
+		}
 		/// <summary>
 		/// Gets the <see cref="Url"/> of the current page's referrer.
 		/// </summary>
@@ -1429,59 +1657,59 @@ namespace Skybound.Gecko
 			}
 		}
 		GeckoSessionHistory _History;
-        /// <summary>
-        /// Gets the favicon of the current WebSite
-        /// </summary>
-        public Icon Favicon
-        {
-            get
-            {
-                var url = Url;
-                var iconurl = String.Format("http://{0}/favicon.ico", url.Host);
-                try
-                {
-                    var request = System.Net.WebRequest.Create(iconurl);
-                    var response = request.GetResponse();
-                    if (response == null)
-                        return null;
+		/// <summary>
+		/// Gets the favicon of the current WebSite
+		/// </summary>
+		public Icon Favicon
+		{
+			get
+			{
+				var url = Url;
+				var iconurl = String.Format("http://{0}/favicon.ico", url.Host);
+				try
+				{
+					var request = System.Net.WebRequest.Create(iconurl);
+					var response = request.GetResponse();
+					if (response == null)
+						return null;
 
-                    var s = response.GetResponseStream();
-                    Image intermediate = Image.FromStream(s);
-                    Bitmap interbediate = new Bitmap(intermediate);
-                    return Icon.FromHandle(interbediate.GetHicon());
-                }
-                catch 
-                {
-                    Bitmap interqbediate = new Bitmap(OpenGeckoSharp.Properties.Resources.deffav);
-                    return Icon.FromHandle(interqbediate.GetHicon());
-                }
-            }
-        }
+					var s = response.GetResponseStream();
+					Image intermediate = Image.FromStream(s);
+					Bitmap interbediate = new Bitmap(intermediate);
+					return Icon.FromHandle(interbediate.GetHicon());
+				}
+				catch 
+				{
+					Bitmap interqbediate = new Bitmap(OpenGeckoSharp.Properties.Resources.deffav);
+					return Icon.FromHandle(interqbediate.GetHicon());
+				}
+			}
+		}
 
 
 
-        /// <summary>
-        /// Gets the favicon of the current WebSite as an image
-        /// </summary>
-        public Image FaviconAsImage
-        {
-            get
-            {
-                if (Url.HostNameType == UriHostNameType.Dns)
-                {
-                    // Get the URL of the favicon
-                    // url.Host will return such string as www.google.com
-                    string iconURL = "http://" + Url.Host + "/favicon.ico";
-                    System.Net.WebRequest request = System.Net.HttpWebRequest.Create(iconURL);
-                    request.Timeout = 400;
-                    System.Net.WebResponse response = request.GetResponse();
-                    System.IO.Stream stream = response.GetResponseStream();
-                    Image favicon = Image.FromStream(stream);
-                    return favicon as Image;
-                }
-                else { return OpenGeckoSharp.Properties.Resources.deffav; };
-            }
-        }
+		/// <summary>
+		/// Gets the favicon of the current WebSite as an image
+		/// </summary>
+		public Image FaviconAsImage
+		{
+			get
+			{
+				if (Url.HostNameType == UriHostNameType.Dns)
+				{
+					// Get the URL of the favicon
+					// url.Host will return such string as www.google.com
+					string iconURL = "http://" + Url.Host + "/favicon.ico";
+					System.Net.WebRequest request = System.Net.HttpWebRequest.Create(iconURL);
+					request.Timeout = 400;
+					System.Net.WebResponse response = request.GetResponse();
+					System.IO.Stream stream = response.GetResponseStream();
+					Image favicon = Image.FromStream(stream);
+					return favicon as Image;
+				}
+				else { return OpenGeckoSharp.Properties.Resources.deffav; };
+			}
+		}
 		#region nsIWebBrowserChrome Members
 
 		void nsIWebBrowserChrome.SetStatus(int statusType, string status)
@@ -1930,7 +2158,7 @@ namespace Skybound.Gecko
 		
 		void nsIEmbeddingSiteWindow2.Blur()
 		{
-		      //throw new NotImplementedException();
+			  //throw new NotImplementedException();
 		}
 
 		#endregion
@@ -1956,7 +2184,7 @@ namespace Skybound.Gecko
 			
 			if (ppv != IntPtr.Zero)
 			{
-			      Marshal.Release(ppv);
+				  Marshal.Release(ppv);
 			}
 			
 			return ppv;
@@ -2034,8 +2262,8 @@ namespace Skybound.Gecko
 			nsIDOMWindow domWindow = aWebProgress.GetDOMWindow();
 			if (domWindow != null)
 			{
-			      if (domWindow != domWindow.GetTop())
-			            return;
+				  if (domWindow != domWindow.GetTop())
+						return;
 			}
 			
 			Uri uri = new Uri(nsString.Get(aLocation.GetSpec));
@@ -2180,7 +2408,7 @@ namespace Skybound.Gecko
 		/// <param name="e">The data for the event.</param>
 		protected virtual void OnDomMouseDown(GeckoDomMouseEventArgs e)
 		{
-            WebBrowserFocus.Activate();
+			WebBrowserFocus.Activate();
 			if (((GeckoDomMouseEventHandler)this.Events[DomMouseDownEvent]) != null)
 				((GeckoDomMouseEventHandler)this.Events[DomMouseDownEvent])(this, e);
 		}

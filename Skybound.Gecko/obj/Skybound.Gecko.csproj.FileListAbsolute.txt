@@ -1,0 +1,11 @@
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug\ResolveAssemblyReference.cache
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug\OpenGeckoSharp.Resources.deffav.bmp
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug\Skybound.Gecko.ChromeDialog.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug\Skybound.Gecko.ConfirmDialog.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug\Skybound.Gecko.PasswordDialog.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug\Skybound.Gecko.PromptDialog.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug\Skybound.Gecko.PropertiesDialog.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug\OpenGeckoSharp.Properties.Resources.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug\OpenGFX.TestBrowser.resources
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug\Skybound.Gecko.csproj.GenerateResource.Cache
+D:\CSProj\geckofx-geckofx-2a21d608a310\Skybound.Gecko\obj\Debug\OpenGeckoSharp.dll

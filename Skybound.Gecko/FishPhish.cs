@@ -16,7 +16,7 @@ namespace Skybound.Gecko
             return new Uri(Url).Host;
         }
 
-        public static bool checkAll(string content, string url)
+        public static bool CheckAll(string content, string url)
         {
             try
             {
@@ -102,15 +102,17 @@ namespace Skybound.Gecko
                         return true;
                     }
                 }
+                /*
+                Foobar code.
                 if (string2domain(url).ToString() != "m")
                 {
                     if (content.Contains("<b>superfoooobar</b>"))
                     {
                         return true;
                     }
-                }
+                }*/
             }
-            catch (Exception ex) {  }
+            catch {  }
             return false;
         }
 

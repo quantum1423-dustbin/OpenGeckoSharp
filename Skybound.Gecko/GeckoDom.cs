@@ -262,10 +262,6 @@ namespace Skybound.Gecko
         nsIDOMNSHTMLElement DomNSHTMLElement;
 
         /// <summary>
-        /// Gets the inline style of the GeckoElement. 
-        /// </summary>
-
-        /// <summary>
         /// Gets the parent element of this one.
         /// </summary>
         public GeckoElement Parent
