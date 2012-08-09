@@ -161,9 +161,6 @@ namespace Skybound.Gecko
 				{
 					// navigating to about:blank allows drag & drop to work properly before a page has been loaded into the browser
 					Navigate("about:blank");
-					/// <summary>
-					/// Unuseful and messes up with MDITabControl
-					/// </summary>
 				}	
 				
 				// this fix prevents the browser from crashing if the first page loaded is invalid (missing file, invalid URL, etc)
@@ -1669,6 +1666,7 @@ Library.</p>
 				try
 				{
 					var request = System.Net.WebRequest.Create(iconurl);
+                    request.Timeout = 300;
 					var response = request.GetResponse();
 					if (response == null)
 						return null;
@@ -1697,15 +1695,22 @@ Library.</p>
 			{
 				if (Url.HostNameType == UriHostNameType.Dns)
 				{
-					// Get the URL of the favicon
-					// url.Host will return such string as www.google.com
-					string iconURL = "http://" + Url.Host + "/favicon.ico";
-					System.Net.WebRequest request = System.Net.HttpWebRequest.Create(iconURL);
-					request.Timeout = 400;
-					System.Net.WebResponse response = request.GetResponse();
-					System.IO.Stream stream = response.GetResponseStream();
-					Image favicon = Image.FromStream(stream);
-					return favicon as Image;
+                    try
+                    {
+                        // Get the URL of the favicon
+                        // url.Host will return such string as www.google.com
+                        string iconURL = "http://" + Url.Host + "/favicon.ico";
+                        System.Net.WebRequest request = System.Net.HttpWebRequest.Create(iconURL);
+                        request.Timeout = 300;
+                        System.Net.WebResponse response = request.GetResponse();
+                        System.IO.Stream stream = response.GetResponseStream();
+                        Image favicon = Image.FromStream(stream);
+                        return favicon as Image;
+                    }
+                    catch
+                    {
+                        return OpenGeckoSharp.Properties.Resources.deffav;
+                    }
 				}
 				else { return OpenGeckoSharp.Properties.Resources.deffav; };
 			}
